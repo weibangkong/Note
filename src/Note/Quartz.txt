@@ -1,0 +1,142 @@
+                                                 Quartz
+OpenSymphony提供的开源任务调度框架，纯java实现，精细控制排程
+
+
+特点：
+    强大的任务调度功能：
+        多任务，任务持久化，防止意外中断，支持任务现场恢复，是spring默认的调度功能
+    灵活运行方式：
+        定于触发器调度时间表，并可以对触发器和任务进行关联映射，提供主键式监听器，各种插件，线程池，支持任务和调度的多种组合方式支持调度数据的
+        多种存储方式
+    分布式、集群能力
+
+Quartz使用的设计模式
+    1.build模式
+    2.Factory模式
+    3.组件模式
+    4.链式写法
+
+Quartz体系结构
+    核心概念：
+        1.Scheduler调度器：负责定期定频率的调度任务
+        2.Job:任务：包括业务逻辑
+        3.Trigger:触发器：告诉调度程序作业什么时候触发，即Trigger对象是用来执行Job(任务)的
+
+        JobDetail：包括任务的实现类和类的一些信息
+        Trigger：触发器包括SimpleTrigger和CronTrigger
+        Scheduler：调度器：定时定频率的执行任务，将JobDetail和Trigger绑定在一起
+
+    ps: 一个job对应多个trigger
+
+
+    重要组成：
+        Job：接口
+        JobDetail：
+        JobBuild
+        JobStore
+        Trigger:
+        TriggerBuild：
+        ThreadPool：
+        Scheduler：
+        Calendar：一个Trigger可以和多个Calendar关联，以排除或包含某些时间点
+        JobListener
+        TriggerListener
+        SchedulerListener
+
+
+    SimpleTrigger:在一个指定时间段内执行一次作业任务或者在指定的时间间隔内多次执行作业任务
+        ps:
+             1.重复次数可以为0，正整数或SimpleTrigger.REPEAT_INDEFINITELY,SimpleTrigger.REPEAT_INDEFINITELY的值为-1
+             表示无限执行
+             3.重复执行间隔必须为0或长整数
+             2.一但指定endTime(结束时间),结束时间会优先于执行次数
+    CronTrigger:基于日历的作业调度，即指定确切日期执行任务
+        Trigger.withScheduler(CronSchedulerBuilder.cronSchedule(Cron表达式))
+        Cron表达式:在线生成工具
+
+
+    Scheduler   使用FactoryModel
+        创建方式:
+            1.
+                SchedulerFactory sf = new StdSchedulerFactory();
+                Scheduler scheduler = sf.getScheduler();
+
+            2.  用来绝对控制Scheduler实例的产生
+                DirectSchedulerFactory dsf = DirectSchedulerFactory.getInstance();
+                Scheduler scheduler = dsf.getScheduler();
+
+        主要方法:
+            1.start()            启动Scheduler
+            2.standby()          暂停Scheduler,可以通过start方法重启，继续执行
+            3.stop()             关闭Scheduler
+            4.shutdown()         关闭Scheduler，不可以通过start方法重启，会抛出异常
+            5.shutdown(boolean)  同样是关闭Scheduler，如果boolean为true会等待job执行完毕后再关闭scheduler，否则直接关闭
+            6.scheduleJob(JobDetail,Trigger)    返回值为最近一次即将要执行的时间
+            7.isShutdown()       Scheduler是否关闭
+
+
+Quartz.properties
+    置于项目工程目录下(与src目录同一级)
+    组成部分：
+        调度器属性
+            instanceName用来区分特定的调度器实例，可以按照功能用途来给调度器起名------------逻辑上的唯一标识符
+            instanceId属性和前者一样，允许热河字符串，但这个值不许再所有调度器实例中是唯一的，尤其在一个集群中，作为集群的唯一key，如果想让Quartz
+            自动生成，则设置成AUTO--------------物理上的唯一标识符
+
+        作业存储设置：描述在调度器实例的生命周期中，Job和Trigger信息是如何被存储的
+
+        线程池属性
+            org.quartz.threadPool.class: org.quartz.simpl.SimpleThreadPool       线程池实现类(一般SimpleThreadPool即可满足所有用户需求)
+            org.quartz.threadPool.threadCount: 10      工作线程数，至少为1，无默认值，一般设置1-100之间的整数，单个任务执行时间太长，需要减小该值
+            org.quartz.threadPool.threadPriority: 5    线程优先级，最大为java.lang.Thread.MAX_PRIORITY 10,最先MIN_PRIORITY 1，越高越先执行
+
+        插件配置：满足特定需求用到的Quartz插件配置
+
+
+springboot 整合quartz：
+    configuration.class:
+
+
+
+        @Configuration
+        public class SchedledConfiguration {
+
+            // 配置中设定了
+            // ① targetMethod: 指定需要定时执行scheduleInfoAction中的simpleJobTest()方法
+            // ② concurrent：对于相同的JobDetail，当指定多个Trigger时, 很可能第一个job完成之前，
+            // 第二个job就开始了。指定concurrent设为false，多个job不会并发运行，第二个job将不会在第一个job完成之前开始。
+            // ③ cronExpression：0/10 * * * * ?表示每10秒执行一次，具体可参考附表。
+            // ④ triggers：通过再添加其他的ref元素可在list中放置多个触发器。 scheduleInfoAction中的simpleJobTest()方法
+
+            向context中添加JobDetail，MethodInvokingJobDetailFactoryBean用来制作一个JobDetail
+            @Bean(name = "detailFactoryBean")
+            public MethodInvokingJobDetailFactoryBean detailFactoryBean(ScheduledTasks scheduledTasks){
+                MethodInvokingJobDetailFactoryBean bean = new MethodInvokingJobDetailFactoryBean ();
+                bean.setTargetObject (scheduledTasks);      //JobDetail
+                bean.setTargetMethod ("reportCurrentByCron");          //需要执行的方法
+                bean.setConcurrent (false);
+                return bean;
+            }
+
+            向context中添加Trigger
+            @Bean(name = "cronTriggerBean")
+            public CronTriggerBean cronTriggerBean(MethodInvokingJobDetailFactoryBean detailFactoryBean){
+                CronTriggerBean tigger = new CronTriggerBean ();
+                tigger.setJobDetail (detailFactoryBean.getObject ());//将JobDetail赋给Trigger
+                try {
+                    tigger.setCronExpression ("0/5 * * * * ? ");//每5秒执行一次
+                } catch (ParseException e) {
+                    e.printStackTrace ();
+                }
+                return tigger;
+
+            }
+
+            @Bean
+            public SchedulerFactoryBean schedulerFactory(CronTriggerBean[] cronTriggerBean){
+                SchedulerFactoryBean bean = new SchedulerFactoryBean ();
+                System.err.println (cronTriggerBean[0]);
+                bean.setTriggers (cronTriggerBean);
+                return bean;
+            }
+        }

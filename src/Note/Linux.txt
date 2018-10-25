@@ -1,0 +1,47 @@
+﻿terminal(终端),shell(命令行解释器),console,bash的区别
+
+
+
+Linux命令
+    uname
+    netstat tunlp 查看端口占用情况
+    lsof i:端口号   查看端口占用情况
+    touch
+    mkdir
+    isdir
+    poweroff               关机
+    shutdown -h now        关机
+    restart                重启
+    find
+    which
+    whereis
+    systemctl  ...    XXX
+               start       启动服务
+               stop        关闭服务
+               restart     重启服务
+               enable      允许开机自启
+               diable      不允许开机自启
+    service XXX ...
+                start      启动xxx服务
+                restart    重启xxx服务
+                stop       关闭xxx服务
+    XXX | XXX              管道,将前面的结果作为后面的输入
+    grep XXX               与XXX匹配筛选
+    mv                     移动文件或重命名文件
+    cp                     复制文件
+    rm                     删除文件
+    groupadd XXX           创建新的用户组
+    groupmod XXX           修改指定用户组
+    groupdel XXX           删除指定用户组
+    useradd  XXX           添加用户
+    usermod  XXX           修改用户
+    userdel  XXX           删除指定用户
+
+    usermod -aG GROUPNAME USER 将指定用户添加到指定用户著
+
+    ps ef |grep XX         查询进程，与ps -ef不同
+
+
+vim命令
+    i   插入
+

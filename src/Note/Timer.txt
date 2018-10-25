@@ -1,0 +1,23 @@
+java.util.Timer:
+    使用
+        Timer.scheduled()
+        Timer.scheduleAtFixedRate(),如果是给定确切时间，如过启动时间超过给定时间，会自动打印之前欠缺的
+        cancel()中止该timer下的所有任务
+        purge()从timer中移除被取消的任务，将被取消的task的引用置为null，会返回被移除的任务数，
+java.util.TimerTask:
+    使用
+        cancel() 停止当前TimerTask里的任务
+        scheduledExecutionTime() 返回当前任务的理论执行时间
+
+
+Timer 缺陷
+    1.管理并发能力不足
+        Timer有且只有一个线程执行定时任务，如若存在多个任务且任务执行时间过长，会导致实际执行结果和预期结果不同
+    2.当任务抛出异常是处理能力不足，即RuntimeException(运行时异常处理能力不足)
+        当TimeTask抛出RuntimeException时,Timer会停止所有任务的运行(应该是该Timer下的所有Task)
+
+
+
+Timer 使用禁区
+    1.对时效性要求较高的多任务并发作业
+    2.对复杂任务的调度
