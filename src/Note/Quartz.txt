@@ -149,4 +149,58 @@ Spring 整合 Quartz
     引入jar包：
         因为quartz需要spring context支持所以需要导入spring-context-suuport
         spring-context-support
+        需要导入sping的事务管理的jar包，否则会报错：从加载器中内省ScheduledFactoryBean失败
         spring-tx
+    Step：
+        1.JobDetail
+            两种方式构建：(推荐使用第二种)
+             1>
+               <bean id="simpleJobDetail" class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
+                            <property name="targetObject" ref="myJob"></property>
+                            <property name="targetMethod" value="printMessage"></property>
+               </bean>
+             2>
+                <bean id="complexJobDetail" class="org.springframework.scheduling.quartz.JobDetailFactoryBean">
+                    <property name="jobClass" ref="complexJob"></property>
+                    <property name="JobDataMap">
+                        <map>
+                            <entry key="" value=""/>
+                        </map
+                    </property>
+                    <property name= "durability" value="true"/>    //允许JobDetail没有Trigger，依旧会保存在JobStore中
+                </bean>
+
+
+        2.Trigger
+            SimpleTrigger:
+                <bean id="simpleTrigger" class="org.springframework.scheduling.quartz.SimpleTriggerFaactoryBean">
+                    <property name="jobDetail" ref="simpleJobDetail"/>
+                    <property name="startDelay" value="1000"/>       //第一次开始延迟
+                    <property name="repeatInterval" value="1000"/>         //每次执行的间隔
+                    <property name="priority" value="5"/>          // 优先级
+                </bean>
+
+
+            CronTrigger:
+                <bean id="cronTrigger" class="org.springframework.scheduling.quartz.CronTriggerFaactoryBean">
+                    <property name="jobDetail" ref="complexJobDetail">
+                    <property name="cronExpression" value="0/5 * * ? * *"/>      //任务执行时间，Cron表达式
+                </bean>
+
+
+
+            3.Scheduler:
+                <bean class="org.springframework.scheduling.quartz.SchedulerFactoryBean">
+                     <property name="jobDetails">
+                          <list>
+                              <ref bean="simpleJobDetail"/>
+                              <ref bean="complexJobDetail"/>
+                          </list>
+                     </property>
+                     <property name="triggers">
+                          <list>
+                              <ref bean="simpleTrigger"/>
+                              <ref bean="cronTrigger"/>
+                          </list>
+                     </property>
+                </bean>
