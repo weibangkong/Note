@@ -1,47 +1,190 @@
 ﻿terminal(终端),shell(命令行解释器),console,bash的区别
 
+Linux系统组成
+    1.系统内核
+    2.shell终端(指令窗口)
+    3.文件系统
+    4.自带的软件系统
 
+Linux系统启动过程
+    1.内核引导boot
+    2.init进程
+    3.系统初始化
+    4.建立终端
+    5.用户登录系统
+
+Linux文件系统
+    1.
+
+Linux系统目录
+    1.bin(binary) 二进制文件目录,可执行的二进制文件,一般软件的执行文件都在这里，常用命令也在这里
+    2.dev         用于存放设备文件--其实是文件，在Linux中，所有的东西都是文件，以文件的形式进行管理
+    3.home        普通用户的主目录(家)，里面是各个用户
+    4.lib64       64位库，存放64位的系统支持库
+    5.lib         32位库
+    6.media       默认外部插入的设备挂载在该目录下，例如U盘，光驱等
+    7.opt         额外安装的可选应用程序包存放位置，一般用户把软件统一安装在这里面，tomcat等都可以安装在这里
+    8.etc         存放系统管理文件和配置文件，包括一些其他的配置文件(类似windows的环境变量)
+    9.usr         用户的很多很多程序和文件都存放其中(类似windows的program files)
+        usr/bin          应用程序
+        usr/game         超级用户的一些应用程序
+        usr/include      linux环境下开发和编译应用程序所需要的头文件(C语言中的#Include)
+        usr/lib          常用的动态链接库和软件包的配置文件
+        usr/local
+        usr/sbin         超级用户使用的管理程序和系统守护程序
+        usr/share
+        usr/src          内核源代码默认放置目录
+    10.root       系统管理员的主目录(家)
+    11.sbin       系统管理员使用的系统级的管理命令和程序，例如ifconfig
+    12.boot       存放引导文件
+    13.lost+found 平时是空的，系统非正常关机时留下的
+    14.var        存放运行时需要改变数据的文件，通常用来存放越来越大的文件，比如各种服务日志
+    15.mnt        系统管理员安装临时文件系统的安装点，系统提供这个目录让用户临时挂载其他的文件系统
+    16.run        临时文件系统，用来存放系统启动以来的信息，系统重启后，该文件夹下内容应该被删除
+    18.proc       虚拟目录，内存的映射，可以通过访问这里获取系统信息
+    19.tmp        存放各种临时文件，是公用的临时文件储藏点
+    20.srv        存放一些服务启动会需要提取的数据
+    21.sys        系统文件
+    22.cdrom      光驱挂载
+
+    ps:
+        Linux中以.开头的文件是隐藏文件
 
 Linux命令
-    uname
-    netstat tunlp 查看端口占用情况
-    lsof i:端口号   查看端口占用情况
-    touch
-    mkdir
-    isdir
     poweroff               关机
     shutdown -h now        关机
     restart                重启
-    find
-    which
-    whereis
-    systemctl  ...    XXX
-               start       启动服务
-               stop        关闭服务
-               restart     重启服务
-               enable      允许开机自启
-               diable      不允许开机自启
-    service XXX ...
-                start      启动xxx服务
-                restart    重启xxx服务
-                stop       关闭xxx服务
+    man command        查看命令帮助手册
+    command --help     帮助手册
+    uname              系统信息
+    netstat tunlp 查看端口占用情况
+    lsof i:端口号   查看端口占用情况
+
     XXX | XXX              管道,将前面的结果作为后面的输入
     grep XXX               与XXX匹配筛选
-    mv                     移动文件或重命名文件
-    cp                     复制文件
-    rm                     删除文件
-    groupadd XXX           创建新的用户组
-    groupmod XXX           修改指定用户组
-    groupdel XXX           删除指定用户组
-    useradd  XXX           添加用户
-    usermod  XXX           修改用户
-    userdel  XXX           删除指定用户
-
-    usermod -aG GROUPNAME USER 将指定用户添加到指定用户著
 
     ps ef |grep XX         查询进程，与ps -ef不同
 
+    wget .............    下载
+    crul                  下载
 
+文件目录:
+    mkdir     创建文件夹
+    rmdir     删除文件夹
+
+
+文件:
+    touch 创建文件
+    mv    移动文件 或着重命名
+    cp    复制文件
+    rm    删除文件
+    cat   重头开始读文件，-n可以显示行号
+    tac   重尾部开始读文件，-n可以显示行号
+    more  当文件内容太多时，cat是看不到前面的内容(太多了)，就可以使用more，分页
+    rename   用命令行的形式批量修改文件名，这个指令有点玄乎，baidu
+    chmod    用来变更目录和文件权限，UNIX系统中，文件或目录权限的控制分为读取，写入，执行3种一般权限来区分，
+
+连接:
+    默认为硬连接
+    ln source target      创建硬连接
+    ln -s source target   创建软连接
+解压缩:
+    打包和压缩的区别
+    打包，解包：
+        打包:将多个文件合并成一个整文件
+        解包:将一个文件包的内容释放出来
+    压缩软件:
+        将文件的大小进行压缩
+
+    命令
+    tar   (可以使用-C 来指定目标路径)
+        -cxvf             创建压缩文件
+        -zxvf             解压缩文件
+
+查找：
+    whereis XXX   查找二进制文件，源代码以及man手册的位置
+    which XXX     查找并显示命令的绝对路径
+    find XXX      用来在指定的目录下查找文件
+         例：
+            find .  列出当前目录及子目录下所有的文件和文件夹
+            find /home -name "*.txt" 查找/home路径下以txt结尾的文件
+            find . \( -name "*.txt" -o -name "*.pdf" \)  查找当前目录下所有的以txt或pdf结尾的文件
+            find . -path "*local" 查找当前目录下路径包含local的文件
+
+系统服务:
+    1.systemctl
+        1.systemctl status XXX
+        2.systemctl start XXX
+        3.systemctl stop XXX
+        4.systemctl restart XXX
+        5.systemctl enable XXX
+        6.systemctl disable XXX
+        7.systemctl list -units --type=service
+
+        ps:
+            iptables -I INPUT -p tcp --dport 22 -j accept    开启22端口，用户远程控制
+            如果开启22端口遇到问题或者打开后还有问题可能是SElinux导致的
+            关闭SElinux:    修改/etc/selinux/config 中的SELINUX=""为disable，然后重启系统
+
+            彻底关闭防火墙:
+                systemctl status firewalld.service
+
+    2.service
+        1.service XXX start
+        2.service XXX stop
+        3.service XXX status
+        4.service XXX restart
+
+        ps:
+            service --status-all 显示所有系统级服务状态
+
+用户和用户组
+    1.用户:
+        users             显示所有用户
+        useradd XXX       添加新用户
+        userdel XXX       删除用户
+        usermod XXX       修改用户
+
+        ps:
+            usermod -aG GROUPNAME USER    将指定用户添加到指定组下
+
+    2.用户组
+        groups            显示所有用户组
+        groupadd XXX      新增用户组
+        groupdel XXX      删除用户组
+        groupmod XXX      修改用户组
+
+安装：
+    1.apt(apt-get)
+        1.apt(apt-get) install XXX   安装XXX   这种方法又时会出问题，可能需要先apt update 一下
+        2.apt(apt-get) remove  XXX   删除XXX
+        3.apt update  更新软件信息数据库
+        4.apt upgrade 更新系统(慎用)
+        5.apt search  搜索软件包
+
+    2.dpkg    Debian用来安装，创建和管理软件包的使用工具
+        1.dpkg -i XXX.deb     安装
+        2.dpkg -r XXX.deb     删除软件包
+        3.dpkg -p XXX.deb     删除软件包的同时删除其配置文件
+        4.dpkg -l             显示已经安装的软件包列表
+        5.dpkg --unpack       解开软件包
+        6.dpkg --confiugre    配置软件包
+
+    3.源码安装 (最好，一旦装成问题最少，但是安装最麻烦)
+        1.下载源码包
+        2.解压
+        3.cd XXX/src
+        4.configure
+        5.make test
+        6.make                完成这一步已经可以正常使用，只是没有将命令加入命令集中
+        7.make install
+
+环境变量：
+    目的:将指定的执行文件信息，配置到系统中，以便在终端的任何位置都可以调用
+    环境变量分为三种：
+        1.系统级环境变量       所有用户登陆后都会加载
+        2.用户级环境变量       配置的操作只有在当前用户下有效
+        3.临时环境变量         在当前终端中有效
 vim命令
     i   插入
 
