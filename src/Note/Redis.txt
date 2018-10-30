@@ -1,0 +1,146 @@
+Redis(Remote Dictionary Server):  开源非关系型数据库，key-value存储系统，通常被称为数据结构服务器,因为值可以是字符串(String)，
+哈希(Hash)，列表(List)，集合(Set)，有序集合(Sort Set),主要以键值对形式存储
+
+优点：
+    性能高，高读写速率
+    数据类型丰富
+    支持数据过期
+    支持数据备份，恢复
+
+安装：采用源码安装
+    下载tar包
+    解压tar包
+    cd xxx
+    make
+    make install
+key(键):个人理解可以最为唯一标识符，用于定位数据
+    普通
+        del key                                   删除key
+        exists key                                判断是否存在指定的key
+        rename key newkey                         重命名key
+        renamenx key newkey                       在newkey不存在时重命名
+        randomkey                                 随机返回当前数据库中的一个key
+        type key                                  判断key对应的value的类型
+        dump key                                  序列化
+        move key db                               将当前库的制定key移动到制定的库中
+        keys pattern                              查找说有匹配的key，支持*
+        flushdb                                   清除当前数据库中所有的key，命令不会失败
+        flushall                                  清除所有现有的数据库的key，命令不会失败
+    过期相关
+        expire key seconds                        给已存在的key添加过期时间，单位秒
+        pexpire key millseconds                   给已存在的key添加过期时间，单位毫秒
+        perxpireat key millseconds-timestamp      给已存在的key添加过期时间，过期时间为时间戳
+        pttl key                                  以毫秒的形式显示剩余过期时间
+        ttl key                                   以秒的形式显示剩余过期时间
+        persist key                               取消key的过期操作
+
+
+
+String(字符串):String是Redis的最基本的数据类型，最大能存储512MB的数据，String类型是二进制安全的，即可以存储任何数据，
+    set key value                                 创建一个key-value
+    setnx key value                               在key不存在是创建一个key
+    setex key seconds value                       创建一个具有过期时间的 key-value
+    getset key value                              获取key的value并重新赋值
+    psetex key millliseconds value                在key不存在是创建一个具有过期时间的key，单位毫秒
+    mget key key...                               获取多个key的value
+    getrange key startindex endindex              获取指定key的value的[startindex,endindex]内容
+    incr key                                      将指定key的value加1
+    incrby key intnumber                          将指定key的value加上某些数
+    incrbyfloat key floatnumber                   增加浮点数
+    decr                                          将key的value减1
+    decrby key intnumber                          将指定key的值减少某些数
+    decrbyfloat key floatnumber                   减少浮点数
+    append key appendvalue                        将指定内容追加到指定key的value中
+    strlen key                                    获取指定key对应的value的长度
+    keys kwb*                                     匹配所有以kwb开头的key
+    setrange key offset value                     从偏移量(offset)开始覆写指定key的value
+    exists key...                                 判断是否存在这个key
+
+Hash(哈希):Map结构，字典结构{name:"kwb",age:"23"},Redis的Hash是一个键值对集合，是一个String的file和value的映射表，适合存储对象，每个Hash
+可以存储2^32-1个field(字段)-value(值)
+    hset key field value [field value...]         将key的field的值设为value
+    hmset key field value [field value...]        给key中的多个field赋值
+    hsetnx key field value                        在不存在的基础上赋值
+    hget key field                                获取key的field的value
+    hmget key field...                            获取key中的多个field的value
+    hgetall key                                   获取key中所有的field和value
+    hkeys key                                     获取key的所有field
+    kvals key                                     获取key的所有value
+    hlen key                                      获取key中有几组field-value
+    hexists key field                             判断key中是否存在指定field
+    hdel key field                                删除key中的指定field
+    hstrlen key field                             获取key中指定field的value的长度
+    hincr key field                               key中field的value+1
+    hincrby key field intnumber                   key中field的value+intnumber
+    hincrbyfloat key field floatnumber            key中field的value+floatnumber
+    hdecr key field                               key中field的value-1
+    hdecrby key field intnumber                   key中field的value-intnumber
+    hdecybyfloat key field floatnumber            key中field的value-floatnumber
+
+List(列表):简单的字符串列表,按照插入顺序排序，可以在头部插入或者尾部插入，左侧(left)为头部,右侧(right)为尾部，元素可重复
+    lpush key value...                            从头部开始插入
+    lpushx key value...                           当key存在时在头部插入
+    rpush key value...                            在尾部插入
+    rpushx key value...                           当key存在时在尾部插入
+    lrange key start end                          从左侧开始遍历[start,end]之间的元素
+    linsert key before|after pivot insertvalue    在某个元素之前或之后插入
+    lset key index value                          设置指定index的value
+    lpop key                                      移除头部第一个元素并将其打印
+    rpop key                                      移除尾部第一个元素并将其打印
+    ltrim key start end                           截取，保留[start,end]之间的元素
+    llend key                                     获取指定key的List的长度
+    lindex key index                              返回指定index的值
+    blpop key... timeout                          移除被指定key的第一个元素，如果key不存在，则会阻塞该List，直至发现可弹出元素或等待超时
+    brpoplpush source destination timeout         从source中弹出一个元素添加到destination中，具有等待超时的功能
+
+Set(集合):String类型的无序集合，集合成员是唯一的，不可重复，Set是通过Hash实现的，所以添加，删除，查找的复杂度都是O(1),集合中最大成员数是2^32-1
+    sadd key member...                            向Set中添加member
+    smembers key                                  返回Set的所有member
+    scard key                                     返回Set的大小
+    srandmember myname [count]                    随机返回key中的成员，可以指定数量
+    spop key [count]                              随机移除并返回key中的一个成员，可以指定移除数量
+    sismember key member                          判断一个字符串是否是指定key的member
+    srem key [count]                              移除指定key中一个或多个member
+    sinter key                                    求几个Set的交集
+    sdiff key                                     求几个Set的差集
+    sunion key...                                 求几个Set的并集
+    smove source destination member               将member从source(原集合)中移动到destination(另一个Set)
+    sinterstore destination key...                将几个Set的交集部分覆盖保存到一个destination
+    sdiffstore destination key...                 将几个Set的差集部分覆盖保存到一个destination
+
+Sort Set(Zset有序集合):同样是String类型的集合，且集合元素唯一不可重复，但是每个元素会有一个score(分数，或者说权重更准确)，通过score对Set元素
+进行排序，虽然元素不可重复，但是权重可以重复，因为同样是通过Hash实现的，因此添加，删除，查找夫制度同样都是O(1),最大成员数同样是2^32-1
+    zadd key score member [score member...]       向指定的Sort Set中添加元素
+    zcard key                                     查询指定Sort Set的元素个数
+    zscore key member                             获取指定member的score
+    zcount key scoremin scoremax                  查询指定Sort Set内score在指定区间内的元素数量
+    zincrby key incrment member                   给指定Sort Set的某个元素的score+incrment
+    zrange key startindex endindex [WITHSCORES]   查找Sort Set中index在[startindex,endindex]的元素,返回的结果按照score排序，
+                                                  可选是否显示score
+    zrank key member                              返回指定成员的index
+    zinterstore destination numkeys key...        将另个Sort Set的交集保存到另一个Sort Set中，numkeys为取交集的集合数，相同元素score会相加
+    zunionstore destination numkeys key...        求并集并保存到另一个Sort Set中，相同原属score会相加，已存在元素会被覆盖
+    zrem key member...                            移除member
+    zremrankbyrank key start end                  移除指定index区间的member
+    zrevange key startindex endindex [withscores] 返回指定key的指定index区间[start,stop],分数从高到低
+    zrevangebyscore key max min [withscores]      返回指定key的指定score区间[start,stop],分数从高到低，允许分页(偏离)
+
+    zlexcount key min max
+    zrangebylex key min max [limit offset count]
+    zremrankbylex key max min
+
+发布订阅(publish,subscribe),符合Topic模式的基本特征
+    订阅：
+        subscribe channel...                       订阅一个或多个频道，不支持通配符*
+        unsubscribe channel...                     退订一个或多个频道
+        psubscribe pattern...                      订阅一个或多个符合给定模式的频道，支持通配符
+        punsubscribe pattern...                    退订一个或多个符合给定模式的频道
+    发布:
+        publish channel message                    发布消息到指定频道
+
+    pubsub <subcommand> [arg...]                   查看发布订阅系统状态
+
+
+
+
+
