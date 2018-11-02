@@ -15,6 +15,7 @@ Docker命令:
             rm XXX              清除指定id的容器记录
             cp XXX XXX          在host和container之间拷贝文件,前面的为源文件,后面的为目标位置
             commit XXX NAME     保存改动为新的image,切记需给新的image指定一个名称和版本(NAME:TAG)
+            tag ID NAME         将指定id的镜像名称改为目标名称
             exec XXX bash       进入指定container内部,XXX是container(容器)id
             build XXX .         构建镜像
             inspect XXX         检查某个指定容器
