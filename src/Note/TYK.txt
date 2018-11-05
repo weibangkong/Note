@@ -1,0 +1,10 @@
+                                             TYK
+GateWay:TYK网关核心组件,依赖redis,从redis获取配置信息，进行代理，不适用DashBoard的话就需要使用GateWay提供的API进行操作
+
+DashBoard:管理工具(非必需)，使用DashBoard进行配置时将配置信息通过GateWay保存到redis，统计信息从MongoDB获取
+
+Pumb:负责分析数据将redis中的相关数据转移到MongoDB中
+
+ps:
+    MongoDB:提供统计相关模块所需的数据
+    详情架构见官网
