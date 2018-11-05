@@ -1,0 +1,21 @@
+JSON-RPC:
+    JSON-RPC是一个无状态轻量级的远程过程调用(RPC)协议，允许运行在基于socket,http等诸多不同消息传输环境的同一进程中，使用JSON最为数据格式
+    JSON可以表示四种原始类型和两种结构化类型:
+        原始类型:String,Numbers,Booleans,Null
+        结构化类型:Array
+
+Java Web:
+
+
+Spring Boot整合JSON-RPC:
+    接口类:@JsonRpcService("/XXX/XXX")   标记某个类时JsonRpc类，对外暴漏的名称
+    实现类:@AutoJsonRpcServiceImpl       标记某个类时JsonRpc服务实现类
+    就将Rpc服务注入到Bean容器中里了
+
+    配置扫描的RPC服务:
+        1.返回AutoJsonRpcServiceImplExporter
+        2.返回AutoJsonRpcClientProxyCreator，在返回的AutoJsonRpcClientProxyCreator中指定Rpc服务端的URL路径，指定提供服务接口的包路径
+        例：
+            AutoJsonRpcClientProxyCreator.setBaseUrl(URL)
+            AutoJsonRpcClientProxyCreator.setScanPackage(PackagePath)
+
