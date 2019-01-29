@@ -1,0 +1,61 @@
+并发:
+    java.util.concurrent 包下
+
+    线程的四个属性:
+        1.优先级: setPriority（）调整，优先级再1-10之间，默认为5，MIN_PRIORITY = 1, MAX_PRIORITY = 10;
+                 static void yield(),使调用线程进入让步状态，即将运行权授予相同优先级的其他进程，该方法是一个静态方法。
+        2.守护进程 setDemon(boolean isDaemon)设置是否为守护进程。
+        3.线程组 ThreadGroup,通过调用getThreadGroup()获取线程所在线程组
+        4.未捕获异常处理器 处理器必须实现Thread.UncaughtExceptionHandler接口,
+          该接口仅有一个方法void uncaughtExecption(Thread t, Throwable e)
+
+    线程的状态:
+        1.new 新创建
+        2.runnable 可运行
+        3.blocked 被阻塞
+        4.waiting 等待
+        5.timed waiting 计时等待
+        6.terminated 被终止
+
+        ps：如果要查看某个线程的状态，调用getState()即可
+
+    实现多线程的两种方式：
+        1. extends(implements)Runnable
+        2. extends Thread (实际本质仍然是继承或实现Runnable接口，因为Thread implements)
+        3. extends(implements)Callable ,通过FutureTask包装器来创建线程
+                例:
+                    Callable<Integer> callable = ()->{
+                        System.out.println("Callable Interface test");
+                        return new Integer(1);
+                    };
+
+                    FutureTask oneTask = new FutureTask(callable);
+                    Thread thread = new Thread(oneTask);
+        4.线程池创建
+
+    临界区:
+        可能被多个线程同时执行的代码片段
+
+    乐观锁:
+        始终认为在自己去拿数据时被人不会修改，所以不会上锁，但是应该提供一种检测机制用以在更新时判断在此期间别人有没有更新数据。
+        例如版本号机制，乐观锁适用于多读的应用类型，可以提高吞吐量，像数据库提供的write_condition机制.
+        再例如java.util.concurrent.atomic包下的原子变量类(AtomicInteger、AtomicIntegerArray等)
+
+    悲观锁:
+        始终任务在自己拿数据时别人会修改，所以在每次拿数据时都会上锁，这样别人在拿数据时必须等待原来锁的持有者释放该锁才可以获得锁
+        （例如 java的synchronized关键字，传统型的关系型数据库中的行锁，表锁，读锁，写锁）
+        ps：区分数据库中的读锁和java中ReentrantReadWriteLock中的readLock，java中的读锁也可以同时让别人读
+
+
+    实现同步的的4中方式:
+        1.synchronized
+        2.ReentrantLock  lock = new ReenTrantLock();
+          lock.lock();
+          try{
+              do something;
+          }catch(xxx x){
+              do something;
+          }finally{
+              lock.unlock();
+          }
+        3.
