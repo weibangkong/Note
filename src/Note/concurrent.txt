@@ -59,3 +59,45 @@
               lock.unlock();
           }
         3.
+
+
+
+
+    阻塞队列(BlockingQueue):
+        支持在队列为空时，有线程取元素需等待队列变成非空，在队列满时，有线程存放元素需等待队列变为可用(即非满状态)。
+                下面顺序按照添加，返回头元素(不从队列中删除)，移除并返回头元素
+        抛出异常型：
+            add(e)     IllegalStateExecption
+            element()  NoSuchElementExecption
+            remove()   NoSuchElementExecption
+        返回特殊值型： ----------------推荐使用
+            offer(e)   如果队列已满，返回false
+            peek()     如果队列为空，返回null
+            poll()     如果队列为空，返回null
+        阻塞型：
+            put(e)      添加阻塞
+            take()      移除并返回阻塞
+
+        超时处理：
+            offer(e,timeout,timeUnit)
+            poll(timeout,timeUnit)
+
+        阻塞队列变种:
+            LinkedBlockingQueue:容量没有上边界，也可以指定上边界
+            LinkedBlockingDuque:上面队列的双端版本
+            ArrayBlockingQueue:构造是需要指定容量，并且具有一个阐述用来指定是否需要公平性，若设置了公平性，则以等待时间最长的线程会优先
+                               得到处理。同时使用公平性，会降低性能，只有确有需要时才使用
+            PriorityBlockingQueue:带有优先级的队列，而不是先进先出队列，元素按照优先级顺序被移除，该队列没有容量上限，但是队列为空时，
+                                  取元素的操作会被阻塞
+            DelayQueue:延时队列，该队列实现了Delayed接口，元素只有在延迟用完的情况下才能从DelayQueue移除，还必须实现compareTo方法，
+                       DelayQueue使用该方法对元素进行排序，getDelay(timeunit),返回对象的残留延迟(剩余延迟)，负值表示延迟结束。
+            TransferQueue:允许生产者线程等待，直到消费者准备就绪，transfer(e):如果有消费者线程正在等待，则直接将该元素交给该消费者线程，
+                          否则则将这个线程添加到队列尾部，并阻塞当前线程，直到有消费者线程取走该元素
+
+        场景：
+            当使用队列来管理线程时，使用阻塞型，使用put(e),take()
+            当向满队列添加元素或者从空队列移除元素，add(e),remove,element会抛出异常
+            当在多线程任务中，一定使用offer(e),peek(),poll()
+
+            ps:
+                poll()和peek()通过返回null来指示失败，因此向这些队列中插入null是非法的
