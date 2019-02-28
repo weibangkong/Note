@@ -122,4 +122,52 @@
         ConcurrentSkipListSet
         ConcurrentLinkedQueue
 
+    synchronized:
+        什么是synchronized：
+            synchronized是java关键字,能够将代码块(方法)锁起来，只需在代码块添加synchronized关键字，即可实现同步(阻塞型)
+            synchronized是一种互斥锁，一次只允许一个线程进入被锁住的代码块
+            synchronized是一种内置锁(监视器锁)，通过汇编发现其是通过
+                java中每个对象都有一个内置锁(监视器锁，也可以理解为锁标记)，synchronized就是使用对象的内置锁(监视器)来将代码块(方法)锁定的
 
+        synchronized用处:
+            保证了线程的原子性(被保护的代码是一次被执行的，没有任何线程会同时访问)
+            保证了可见性(执行完synchronized后，修改后的变量对其他线程是可见的)
+
+        synchronized原理:
+            对象内置锁
+            monitor监视器
+
+
+    synchronized与Lock的区别:
+        Lock能完成synchronized所实现的所有更能，Lock有比synchronized更精确的线程语义和更好的性能，并且不强制要求一定要获取到锁，
+        synchronized会自动释放锁，而Lock必须手动释放，且最好在finally{}中释放
+
+    题目:
+        sleep()与wait()的区别:
+            1.sleep()使Thread的方法，wait()是Object的方法
+            2.sleep()使用户使对象进入停滞(阻塞）状态，但是依旧持有锁，其他线程无法进入临界区代码块等待睡眠时间结束后，时间到达后
+            该线程不一定会立即执行，其他线程可能正在执行或者没有被调度为放弃执行
+            wait()会使线程进入到一个和该对象相关的等待池中，同时失去对象的机锁(wait(time)超时后还需要返还对象所)，其他线程可以
+            访问临界区，wait()后使用notify(),notifyAll()或者指定睡眠时间来唤醒当前等待池中的线程，wait()必须放在synchronized
+            block 块中
+
+            最大区别:
+                sleep()使线程休眠不释放锁，wait()释放锁
+                wait()和sleep()都可以通过interrupt()方法打断线程的暂停状态，使线程抛出InterruptExecption(不推荐)
+
+
+        sleep()和yield()的区别
+            1.sleep()方法给别的线程运行机会时，不会考虑别的进程的优先级，给低优先级的进程运行机会，yield()只给同级或者更高优先级的进程
+            运行机会
+            2.sleep()使程序阻塞,yield()剥夺线程的运行权，是线程进入就绪态(Runnable)
+            3.sleep()抛出InterruptExecption，yield()不会抛出异常
+            4.sleep()具有更好的可移植性
+
+        sleep(XX) 休眠
+        wait()    等待
+        yield()   让步
+
+        线程和进程：
+            进程是具有一定独立功能的程序关于某个数据集合上的一次运行活动，是操作系统进行资源分配和调度的一个独立单位
+            线程是进程的一个实体，是cpu调度和分派的基本单位，是比进程更小的能独立运行的基本单位
+            线程的划分尺度小于进程，使得多线程编程通常能带来更好的性能和用户体验，但是多线程程序对其他程序不友好，可能占用更多资源
