@@ -1,0 +1,58 @@
+流:
+    字节流:在传输过程中以字节为最基本单位的流
+          通常以Stream结尾
+          主要输入流:
+            InputStream:
+                字节输入流的抽象基类
+            FileInputStream
+                继承自InputStream，主要用来操作文件输入流，用来读取文件，除了可以InputStream定义的函数外，还实现了基类的read()
+                read()每次只读一个字节的数据，返回结果是一个int，如果编码是以一个字节一个字符的，可以尝试转换成char，用来查看数据
+            BufferedInputStream (不是InputStream的直接实现类，而是直接继承FilterInputStream)
+                带有缓冲区的流，是一种装饰流，封装别的流以提高效率的流，初始化时需要传入一个InputStream对象
+          主要输出流：
+            OutPutStream
+            FileOutputStream
+                构造时，可选第二个参数(append),是否追加，true为将内容追加到原有内容后面，默认为false
+            BufferedOutputStream (与BufferedInputStream一样继承自FilterOutputStream)
+                需要flush()
+    字符流:在传输过程中以字符为最近本单位的流
+          通常以Reader/Writer结尾
+          主要输入流:
+            Reader
+                字符输入流的抽象基类
+            InputStreamReader
+                可以把InputSream中的字节数据根据字符编码方式转换成字符数据流，除了可以使用基类的基本方法，还实现了
+                read(char[] cbuf,int offset,int length),从offset位置开始读，读length个字符到cbuf中，返回实际
+                读取到的字符个数，读到流尾时返回-1
+
+                构造时需要传入一个InputStream，可以指定第二个参数(指定字符编码方式)
+            FileReader
+                可以将FileInputStream中的字节数据根据编码方式转换成字符数据流，初始化时需要传入一个File或者其路径
+            BufferReader
+                可以将字符流进行封装，将数据进行缓冲，提高效率，同样实现read(char[] cbuf,int offset,int length)
+                readLine() 读取一个文本行，以行结束符为末尾，返回结果是读取的字符串，如已经到达流尾，返回null
+                初始化时需要一个字符流
+          主要输出流:
+            Writer
+                write(char[] ch)往输出流中写入一个字符数组
+                write(int c)往输出流中写入一个字符
+                write(String str)往输出流中写入一个字符串
+                write(String str,int off,int length)往输出流中写入字符串的一部分
+                close()  抽象方法
+                flush()  抽象方法
+            OutputStreamWriter
+                可以往输出流中写字符串数据，里面会自动将字符数据根据编码方式转换为字节数据写入到输出流，相当于一个中介/桥梁
+                初始化时需要一个字节输出流OutputStream
+            FileWriter
+                可以直接往流中写字符串数据，同样会根据字符编码把字符数据转换成自己数据再写入到输出流
+            BufferWriter
+                字符缓冲流
+                newLine(),写入一个换行符
+
+
+    ps:
+      先开的后关，除非存在以来关系，装饰流类的封装流，只需关闭最外层的流，会自动关闭被套用的流
+
+      计算机的传输本质都是字节流，而一个字符是由多个字节组成，转换成字节前，需要先去查表转成字节，所以传输有时需要用到缓冲区
+
+      InputStream和OutputStream是抽象基类，不可实例化，但是可以接口引用
