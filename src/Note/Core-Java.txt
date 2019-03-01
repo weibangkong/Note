@@ -118,5 +118,18 @@ Out of memory(内存溢出)与memory leak(内存泄漏):
         内存泄漏本身并不会产生什么危害，但是如果内存泄漏堆积最终导致内存溢出，会耗尽系统所有内存，产生严重危害。
         一次性内存泄漏危害性并不大，隐式泄漏危害最大，因为与常见性和偶发性相比较难发现。
 
+
+String 、StringBuilder 、StringBuffer的区别
+    String是定长的，赋值后不可修改的，StringBuilder和StringBuffer是可变长的
+    StringBuilder与StringBuffer是使用的缓冲技术的，具有自动扩容的功能
+    StringBuffer是线程安全的StringBuilder是线程不安全的
+
+    ps:
+        String 是使用享元模式实现的，每次拼接都要重新分配空间，StringBuffer与StringBuilder是可以把先拼接的字符串保存起来，到最后调用
+        toString()时一次分配空间
+
+        String str = "abcde" 等价于String str = "abc" + "d" +"e" ,二者没有区别
+        String str = "abc"; str = str + "de"; 前后两个str的对象并不是一个，且慢
+
 java深拷贝与浅拷贝和值传递和引用传递:
      忘了
