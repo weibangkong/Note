@@ -1,0 +1,78 @@
+JDBC操作数据库的步骤
+    1.加载驱动
+        Class.forName("oracle.jdbc.driver.OracleDriver");
+    2.创建连接
+        Connection conn = DriverManager.getConnection("jdbc:oracle:thin:@localhost:1521:orcl",username,password);
+    3.创建语句
+        PreParedStatement ps = con.getPreparedStatement("select from a where a.c = ?"):
+        ps.setInt(1,xxx); 1代表第一个问号
+    4.执行语句,获取结果
+        ResultSet rs = ps.executeQuery();
+    5.处理结果
+        while(rs.hasNext){
+            System.out.printlf(rs.getInt("empno")+":"+rs.getString("ename"));
+        }
+    6.关闭资源 --- 先开的后关，通常关闭连接时，连接上创建的语句，结果集也会被关闭，但并非总是如此
+        finally{
+            if(rs ! =null){
+                try{
+                    rs.close()
+                }
+            }
+            if(ps ! =null){
+                try{
+                    ps.close()
+                }
+            }
+            if(conn ! =null){
+                try{
+                     conn.close()
+                }
+            }
+        }
+
+
+Statement 与PrepareStatement的区别，性能对比
+    与 Statement相比，
+        1：ps代表预编译语句，优势在于可以减少SQL编译错误，并减少SQL注入的可能性。
+        2：ps的SQL语句是可以带参数的，避免了使用字符串连接拼接SQL语句的麻烦与不安全
+        3：批处理SQL或者频繁执行相同的查询语句时，ps有明显的优势，
+           由于数据库可以将优化后的SQL语句缓存起来，下次执行相同结构的语句会很快,不用再次编译和生成执行计划
+
+
+提高JDBC的读取数据的性能：
+    可以通过指定结果集对象的setFetchSize()指定每次抓取的数据条目(典型的空间换时间策略)
+提高JDBC的更新数据的性能:
+    可以使用PrepareStatement语句构建批处理，将若干个SQL语句置于一个批处理中执行
+
+
+
+事务：
+    四大特性(ACID)：
+    A：原子性(atomic),要么不做，要么全做
+    C: 一致性(consisent),事务结束后系统状态一致,或者说数据库从一个一致态变为另一个一致态
+    I: 隔离性(Isolated),并发的事务是彼此隔离的，无法看到对方的中间状态
+    D: 持久性(Durable)，事务一旦执行完毕，数据被持久化
+
+    只有在存在并发数据访问时才需要事务,当多个事务访问同一数据时，可能存在5类问题，
+    包括3类数据读取问题(脏读，不可重复读，幻读)和2类数据更新问题(第1类丢失更新和第2类丢失更新)
+    脏读: 读取了中间数据(脏数据)
+    不可重复读：A第一次读取到900，然后B进行一次改写存入100，编程1000，A再次读是1000，与第一次不匹配
+    幻读：
+
+    第1类丢失：A执行事务执行失败，回滚，把B事务提交的数据覆盖掉
+    第2类丢失: A执行事务执行成功，提交，把B事务提交的数据覆盖掉
+
+锁：
+    按照锁定对象的不同分为表级锁和行级锁
+    按照并发事务锁定关系不同分为共享锁和独占锁
+
+    数据库提供了自动锁机制，只要用户指定事务隔离级别，数据库会自动根据SQL判断添加什么锁
+
+
+
+    事务隔离级别与并发是对立的，事务隔离级别越高并发性能越差
+
+
+JDBC进行事务操作
+
