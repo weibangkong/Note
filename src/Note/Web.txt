@@ -1,0 +1,67 @@
+Web
+servlet生命周期：
+    1.加载和实例化，由web容器执行，但是用户需要指定web.xml来制定servlet的位置，成功加载后，web容器辉通过反射来实例化servlet
+    2.初始化，当一个servlet被实例化后，容器会调用init()初始化这个servlet对象,目的是为了在处理客户端之前进行一些准备工作，如连接数据库，读取
+      资源文件等，如果初始化失败，该servlet会被直接卸载，该方法在servlet的生命周期内仅会执行一次
+    3.请求处理，当有请求时，servlet将调用service()方法进行处理，常用的是根据请求类型调用doGet(),doPost(),
+      处理过程中，可以通过ServletRequest获取请求，也可以利用ServletResponse设置相应信息
+    4.销毁，当web容器关闭或者检测到一个servlet要从容器中删除时，会自动调用destroy(),以便让该实例释放所占用资源
+    5.卸载，当一个servlet实例调用玩destroy()后，该实力就会等待被GC回收，如果需要再次调用该Servlet时，会重新调用init()
+
+Session的生命周期:
+    Session生效:
+        在客户端第一次访问服务器时创建
+    Session失效:
+        1.服务器会把长时间没有活动的Session从服务器清楚，此时Session失效，Tomcat默认为20min
+        2.调用Session.invalidate()
+        在超出设置的失效时间，失效时间是从不活动的时候计算，一旦Session被访问，计时清0
+
+    设置Session失效时间：
+        1.web.xml:
+            <session-config><session-timeout>30</session-timeout></session-config>
+        2.在程序中手动设置：
+            session.setMaxInactiveInterval(30*60)  -----    以秒为单位，-1 为永不过期
+        3.在Tomcat设置
+
+
+    ps:
+        Session也是保存在在服务器端的，保存在客户端的是Cookie
+        Session只有在访问JSP、Servlet时才会生成，在访问HTML、Image等静态资源时并不会创建Session，可以通过request.getSession(true)获得
+
+JSP:
+    jsp九大内置对象:
+        request:封装客户端请求，其中包含GET和POST()请求的参数
+        response:封装服务器对客户端的相应
+        pageContext:通过该对象可以获得其他对象
+        session:封装用户绘画的对象s
+        application:封装服务器运行环境的对象
+        out：输出服务器相应的输出流对象
+        config:Web应用的配置对象
+        page:JSP页面本身
+        exception:封装页面中抛出的异常
+
+    四个作用域：
+        page                在当前页面有效
+            只在当前页面有效，也就是用户请求的页面有效，当页面跳转或者关闭，page对象将在响应回馈给客户端后释放
+        request             在本次请求有效
+            在当前请求中有效，通过setAttribute()实现页面中信息传递，也可以通过forwar()方法进行页面间跳转，request是转发不是重定向
+            对于浏览器来说是透明的，地址栏上显示的依旧是最初的值
+        session             在当前会话有效
+            在当前会话中有效，当一台客户端上的同意浏览器对服务器进行多次访问，在这多次访问之间传递的信息就是session作用域的范围，从浏览器
+            发出第一个请求即可认为会话开始，但是会话结束时间是不确定的，因为在浏览器关闭时并不会通知服务器，一般tomcat设置默认时间是120分钟
+            也可以通过setMaxInactiveInterval(int) 设置，或者通过invalidate()强制结束当前会话
+        application         在应用程序中有效
+            数据是保存在服务器端的，从服务器开始到服务器关闭这段时间都是有效的，同样通过setAttribute()和getAttribute()赋值
+
+JSP与Servlet的异同点：
+    JSP经过编译后就是Servlet(jsp本质就是Servlet，JVM只能识别Java类，不能识别JSP代码，web服务器将JSP编译成JVM能识别的Java类)
+    JSP更擅长页面显示，Servlet更擅长逻辑处理
+    Servlet没有内置对象，JSP的内置对象需要使用HttpServletRequest和HttpServletResponse或者HttpServlet获取
+    JSP是Servlet的一种简化封装，编译后是"类Servlet"
+    最主要不同点在于:
+        Servlet的应用逻辑是在Java中，并完全从HTML里分离出来,而JSP则是Java+HTML组合成一个扩展名为.jsp的文件
+        JSP侧重于视图，Servlet侧重于逻辑控制
+        Servlet更多的是类似于一个控制器，用来做控制
+
+    ps:
+        Session只有在访问JSP、Servlet时才会生成，在访问HTML、Image等静态资源时并不会创建Session，可以通过request.getSession(true)获得
