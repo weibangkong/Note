@@ -8,6 +8,26 @@ servlet生命周期：
     4.销毁，当web容器关闭或者检测到一个servlet要从容器中删除时，会自动调用destroy(),以便让该实例释放所占用资源
     5.卸载，当一个servlet实例调用玩destroy()后，该实力就会等待被GC回收，如果需要再次调用该Servlet时，会重新调用init()
 
+转发forward与重定向(redirect)的区别：
+    转发：地址栏不可见，服务器内部实现，而重定向是地址栏可见的，服务器让浏览器重新发送一个请求，且从定向以后request中的对象失效，转发不会，
+    会造成资源丢失
+
+
+
+Get与Post提交区别
+    1.在Rest风格中，Get是用来获取数据的，Post是用来向服务器提交数据的
+    2.Get在回退是无害的，Post在回退时会再次提交请求
+    3.Get产生的URL可以被书签，Post不可以
+    4.Get请求会被浏览器主动Cache，而Post不会
+    5.Get只能URL编码，Post可以支持多种编码
+    6.Get提交参数是在地址栏中，参数会随着URL被保留在浏览器中，且只接受ASCⅡ字符，Post提交放在消息头或者消息体中，且参数不会被保留，没有限制
+    7.Get提交最大1024字节，Post没有限制
+    8.Get提交发送一次TCP包，Post发送两次TCP包，在网络情况不好的情况下，优先Post提交
+
+    ps:本质上Get和Post提交没有区别，都是通过HTTP实现，HTTP底层又是TCP/IP,所以Get和Post的底层都是TCP链接，但是在Get的requestBody中带数据
+    有的服务器会读取，有的不会
+       Get会把header和data一起发送到服务器，而Post会先发送header，再发送data
+
 Session的生命周期:
     Session生效:
         在客户端第一次访问服务器时创建
