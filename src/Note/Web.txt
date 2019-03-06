@@ -12,6 +12,18 @@ servlet生命周期：
     转发：地址栏不可见，服务器内部实现，而重定向是地址栏可见的，服务器让浏览器重新发送一个请求，且从定向以后request中的对象失效，转发不会，
     会造成资源丢失
 
+HttpServletRequest类的getAttribute()和getParameter()区别:
+    1.getParameter()用来接收post/get传递过来的请求参数
+    2.getAttribute(),必须先setAttribute()
+    3.getParameter是通过容器的实现来获取post/get等HTTP方式传入的数据，getArrtibute（set）只是在web容器内部流转，仅仅是请求处理阶段
+    4.getParameter()会从web客户端到web服务端，代表Http请求，返回的是String类型的数据
+    5.attribute有set和get，而parameter只有get
+
+    总结:
+        1.parameter没有set方法
+        2.parameter用来获取http请求中的参数
+        3.attribute用来做数据共享(个人理解，慎重)
+
 
 
 Get与Post提交区别
@@ -53,7 +65,7 @@ JSP:
         request:封装客户端请求，其中包含GET和POST()请求的参数
         response:封装服务器对客户端的相应
         pageContext:通过该对象可以获得其他对象
-        session:封装用户绘画的对象s
+        session:封装用户会话的对象
         application:封装服务器运行环境的对象
         out：输出服务器相应的输出流对象
         config:Web应用的配置对象
@@ -73,6 +85,14 @@ JSP:
         application         在应用程序中有效
             数据是保存在服务器端的，从服务器开始到服务器关闭这段时间都是有效的，同样通过setAttribute()和getAttribute()赋值
 
+    JSP的静态包含<%@ include file=""%>和动态包含<jsp:include page ="">的区别
+        1.静态包含使用JSP的include指令包含，动态包含是使用JSP的标准动作<jsp:forward>包含
+        2.静态包含是编译时包含，两个页面合二为一，编译成一个class文件，被包含页面不存在会发生编译错误两个页面的contentType属性保持一致，
+          被包含的页面发生改动必须熟悉包含页面，动态页面时运行时包含，编译成两个class文件，并可以向被包含页面传递参数，两个页面是独立的，
+          被包含页面不在不会报错，不影响其他部分的执行
+
+
+
 JSP与Servlet的异同点：
     JSP经过编译后就是Servlet(jsp本质就是Servlet，JVM只能识别Java类，不能识别JSP代码，web服务器将JSP编译成JVM能识别的Java类)
     JSP更擅长页面显示，Servlet更擅长逻辑处理
@@ -83,5 +103,19 @@ JSP与Servlet的异同点：
         JSP侧重于视图，Servlet侧重于逻辑控制
         Servlet更多的是类似于一个控制器，用来做控制
 
-    ps:
+    ps:s
         Session只有在访问JSP、Servlet时才会生成，在访问HTML、Image等静态资源时并不会创建Session，可以通过request.getSession(true)获得
+
+
+Hibernate:
+    SessionFactory是否是线程安全的，Session呢，两个线程可以共享一个Session么
+    SessionFactory是线程安全的，可以同时被多个线程访问，Session是一个轻量级非线程安全的对象，线程之间也不能共享
+
+    SessionFactory一般在程序启动时构建，最好做成单例模式
+    Session表示与数据库进行交互的工作单元，Session由SessionFactory创建，在任务完成之后关闭(应关闭)，Session是持久层服务对外提供的主要接口
+    Session会延时获取数据库连接(在需要的时候才会获取)，为了避免创建过多Session，可以将其与ThreadLocal绑定，Hibernate3中的SessionFactory
+    .getCurrentSession()就可以做到
+
+    get()和load()的区别:
+        1.返回值:在一级缓存Session里存在记录时，get()和load()都返回实际对象，在Session中不存在缓存时，去二级缓存中查询在没有查找到记录时，get()返回null，load()抛出异常
+    2：get()方法直接返回实体类对象，load()方法返回实体类对象的代理
