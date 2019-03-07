@@ -1,0 +1,110 @@
+Hibernate:
+
+Hibernate中对象的状态：
+    1.瞬时态(transient)   new出来后，还没由进行session.save(),在数据库和session中都没有对应的记录
+        特点:不和session实例关联
+            在数据库中没有和其关联的对象
+    2.持久态(persistent)   已经被保存进数据库中，并且该对象还在缓存中，在session中对持久对象的改变不会马上对数据库写入，必须commit(),才会
+                          写入数据库，commit()之前的对象叫脏对象
+        特点:
+            与session实例关联
+            在数据库中有与其相关联的记录
+        将瞬时态的对象转化为持久态：
+            通过session.save()或saveOrUpdate(),persist()将一个瞬时态对象与数据库关联，这个瞬时对象就变成了持久对象
+        将游离态对象变为持久态:
+            update(),saveOrUpdate(),lock(),replicate()
+
+    3.游离/托管态(detached)    当一个持久化对象，脱离hibernate的缓存管理后，就是一个游离状态，在与持久化对象关联的session实例被关闭后，
+                              对象就变成了游离状态，游离状态的对象引用依然有效，依旧可以对其进行修改
+        特点：
+            没有与session实例关联
+            在数据库中有对应条目
+        将持久化状态变为游离态：
+            close(),clear(),evict(),对象由持久态变为游离态
+        将
+
+    4.移除态(removed)
+
+    ps:
+        save()是将一个瞬时态变为持久态，update()是将一个游离态变为持久态
+
+        save(),persist()会触发insert语句
+        update(),merge()会触发update()语句
+
+        merge()会将新的状态合并到已有的持久化对象或者创建一个新的持久化对象
+        persist()
+
+        update()是将一个已经更改过的游离态对象持久化
+        lock()是将一个未更改的游离态对象持久化
+
+SessionFactory是否是线程安全的，Sessions是否是线程安全的(是否可以两个线程共享一个Session)：
+    1.SessionFactory是线程安全的，并且可以多线程并发访问，Session是一个轻量级非线程安全对象，线程之间不可共享
+
+    ps：SessionFactory 推荐通过单例模式进行封装
+        Session表示与数据库进行交互的一个工作单元，由SessionFactory创建，使用完毕后应关闭，延迟获取数据库连接(需要时才会获取)，为避免创建
+        太多Session，可以将Session与ThreadLocal绑定，可以使同一个线程总是获得同一个Session，3.0中的getCurrentSession()即可实现
+
+session加载实体对象的机制：
+    1.会在向数据库查询前先在一级缓存中根据实体类型和id进行查找，如果一级缓存查找命中且状态合法化，则返回目标
+    2.如果一级缓存没有目标，session会现在NonExists中进行查找，如果存在相同的查询条件，返回null
+    3.查询二级缓存，如果命中返回目标
+    4.如果在二级缓存中也没有找到目标，则发出SQL语句，如果数据库中也没有查询到，则将查询条件记录到NonExists中，并返回null
+    5.根据映射配置和SQL语句得到ResultSet，并创建对应实体对象
+    6.将对象纳入一级缓存(session)管理,
+    7.如果有对应的拦截器，执行拦截器的onload()方法
+    8.如果开启二级缓存(sessionfactory),则将对象纳入二级缓存管理
+    9.返回对象
+
+
+Session.list()和Session.iterator()区别:
+1.list()不用一级缓存和二级缓存（对缓存只写不读），只有在开启缓存查询的情况下使用缓存，iterator()充分利用缓存，如果目标只读或者频繁读取，
+  使用iterator()可以减小性能开销
+2.list()不会引发N+1问题，iterator可能会引发N+1问题，因为延迟加载机制，只保存对象
+
+
+延迟加载和session关闭的矛盾:
+    1.关闭延时加载特性，但会存在明显缺陷，去掉延迟加载的化每次查询开销都会变大
+    2.在session关闭之前先获取需要查询的数据，可以使用Hibernate.isInitialized()判断是否被加载，如果没有被加载则调用.initialize()加载
+    3.使用拦截器或者过滤器演唱session的生命名周期直到视图获得数据。spring整合hibernate提供的
+        OpenSessionInViewFilter和OpenSessionInViewIntercepter就是这种做法
+
+多对对关联映射
+可以在实体类上添加@ManytoMany注解配置多对多关联
+
+继承映射理解:
+    继承关系的映射策略有三种：
+        每个继承结构一张表:不管多少子类都用一张表
+        每个子类一张表：公共信息放一张表，特有信息放单独一张表
+        每个具体类一张表:有多少子类放多少表
+
+一级缓存，二级缓存，查询缓存
+    1.1j是由hibernate的session提供，默认有效，当程序保存，更新持久化对象时，不会立即将改变提交的数据库，而是缓存到session种，通过显式调用
+    flush()或close(),才会提交到数据库，可以减少与数据库的交互，提高数据库访问性能
+    2.2j(sessionfactory)是全局性的，所有session可以共享这个2j缓存，不过默认关闭，需要开启，需要指定使用哪种二级缓存实现类(可以由第三方提供)
+    一旦开启2j并指定需要缓存的实体类，sessionfactory就会缓存访问过的该实体类的每个对象，除非缓存的数据超出指定缓存空间
+    3.1j和2j都是对整个实体类的缓存，不会缓存普通属性，如果希望对普通属性缓存，可以使用查询缓存，cx是将hql或sql语句以及他们的查询结果最为键值对
+    进行缓存，同样是默认关闭的，需要开启
+
+
+分页查询：
+    session.createQuery(hql).setFirstResult(start).setMaxResult(stop).list();
+    或
+    sesion.createCriteria(clazz).setFirstResult(start).setMaxResult(stop).list();
+
+Criteria: Hibernate独有，无语句面向对象查询，一般用于单表查询
+
+get()和load()的区别:
+    1.get()返回实际对象，load()返回代理对象(一级缓存如果存在对应数据则也返回实际对象)--------延迟加载机制，在使用时再去查询
+    2.在没有查询到记录的情况下，get()返回null，load()则抛出异常
+    3.在3.0之前get只在一级缓存中进行查找，如果没有对应数据则跳过二级缓存，直接发出SQL到数据库查找，而load()会先去二级缓存查找，如果没有再SQL
+
+    ps:对于load()，Hibernate认为该数据在库中一定存在可以放心使用延迟加载机制，如果没有数据则抛出异常
+
+
+Session方法:
+    1.save();
+    2.update();
+    merge();
+    lock();
+    saveOrUpdate()
+    persist()
