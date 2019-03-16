@@ -1,4 +1,239 @@
 MyBatis:
 
-#和$
-    #:
+
+spring整合mybatis:
+    1.编写config.properties
+    2.配置mybatis数据库连接部分：
+    例：
+    <?xml version="1.0" encoding="UTF-8"?>
+    <beans xmlns="http://www.springframework.org/schema/beans"
+           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+           xmlns:context="http://www.springframework.org/schema/context"
+           xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans.xsd
+           http://www.springframework.org/schema/context
+            http://www.springframework.org/schema/context/spring-context.xsd">
+
+        <!--因为后面有用spring-mybatis整合的MapperScannerConfiurer负责扫描mapper接口，并添加到Spring容器中，
+        因此不需要再将其设置为扫描包路径-->
+        <!--<context:component-scan base-package="com.kwb.dao"/>-->
+        <!--扫描server层 -->
+        <context:component-scan base-package="com.kwb.service.impl"/>
+        <!--配置要引入的配置文件-->
+        <!--ignore-unresolvable 是否忽略无法解决的-->
+        <context:property-placeholder location="config.properties" ignore-unresolvable="true"/>
+
+        <!--配置druid-->
+        <bean id="dataSource" class="com.alibaba.druid.pool.DruidDataSource">
+            <property name="driverClassName" value="${jdbc.driverClassName}"/>
+            <property name="url" value="${jdbc.url}"/>
+            <property name="username" value="${jdbc.user}"/>
+            <property name="password" value="${jdbc.password}"/>
+
+            <property name="initialSize" value="0"/>
+            <property name="maxActive" value="5"/>
+            <property name="minIdle" value="0"/>
+            <property name="maxWait" value="60000"/>
+            <property name="validationQuery" value="SELECT 1"/>
+            <property name="testOnBorrow" value="false"/>
+            <property name="testOnReturn" value="false"/>
+            <property name="testWhileIdle" value="true"/>
+            <property name="timeBetweenEvictionRunsMillis" value="60000"/>
+            <property name="minEvictableIdleTimeMillis" value="25200000"/>
+            <property name="removeAbandoned" value="true"/>
+            <property name="removeAbandonedTimeout" value="1800"/>
+            <property name="logAbandoned" value="true"/>
+            <property name="filters" value="mergeStat"/>
+        </bean>
+
+        <!--Mybatis-->
+        <bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+            <!--使用数据员-->
+            <property name="dataSource" ref="dataSource"/>
+            <!--配置实体类Entity的路径-->
+            <property name="typeAliasesPackage" value="com.kwb.entity"/>
+            <!--配置Mapper.xml文件路径-->
+            <property name="mapperLocations" value="classpath:com/kwb/mappers/*.xml"/>
+        </bean>
+        <!--配置Mapper接口(注意是接口)-->
+        <bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+            <property name="basePackage" value="com.kwb.dao"/>
+            <property name="sqlSessionFactoryBeanName" value="sqlSessionFactory"/>
+        </bean>
+    </beans>
+
+
+
+
+
+关联查询
+Mapper.xml：
+一对一关联:
+    1.嵌套查询：分两次查询，第一次查出本来的数据，第二次查出关联数据（会带来N+1的问题),不推荐
+    <resultMap id="baseMap1" type="">
+        <id column="xxx" property="xxx"/>
+        <result column="xxx" property="xxx"/>
+        <result column="xxx" property="xxx"/>
+        <association property="1" column="2" select="selectForeign"></association>
+    <resultMap>
+
+    <resultMap id="foreignMap">
+        <id column="xxx" property="xxx"/>
+        <result column="xxx" property="xxx"/>
+        <result column="xxx" property="xxx"/>
+    </resultMap>
+
+    <select id="selectForeign" resultMap="foreignMap">
+        select * from foreignTable where id = #{id}
+    </select>
+
+    2.嵌套结果：一次查询，使用表连接，一次将本体数据和关联数据都查出来，将结果分别封装到实体中
+     <resultMap id="baseMap1" type="">
+            <id column="xxx" property="xxx"/>
+            <result column="xxx" property="xxx"/>
+            <result column="xxx" property="xxx"/>
+            <association property="1" javaType="xxx">
+                <result column="xxx" property="xxx"/>
+                <result column="xxx" property="xxx"/>
+            </association>
+     </resultMap>
+
+     <select id="xxx" resultMap="baseResultMap">
+        select * from b left join on b.id= a.id where id= #{id}
+     </select>
+
+一对多关联:
+<resultMap id="xxx" type="" >
+    <id column="" property=""/>
+    <result column="" property=""/>
+    <result column="" property=""/>
+    <collection column="xxx" ofType="com.xxx.entity.xxx">
+        <result column="xxx" property="xxx">
+        <result column="xxx" property="xxx">
+        <result column="xxx" property="xxx">
+    </collection>
+</resultMap>
+
+<select id="" resultMap="">
+    select * from a right join b on a.id=b.fid where a.id = #{id}
+</select>
+
+
+MyBatis-Generator:
+整合:
+    1.mybatis-generator-core.jar和mybatis-generator-maven-plugin.jar
+    2.generatorConfig.xml
+    例：
+    <?xml version="1.0" encoding="UTF-8"?>
+    <!DOCTYPE generatorConfiguration
+            PUBLIC "-//mybatis.org//DTD MyBatis Generator Configuration 1.0//EN"
+            "http://mybatis.org/dtd/mybatis-generator-config_1_0.dtd">
+
+    <generatorConfiguration>
+        <!--指定引入的资源-->
+        <properties resource="config.properties"/>
+        <!--jdbc连接地址-->
+        <!--指定jdbc绝对路径-->
+        <classPathEntry location="D:/localRepository/MavenRepository/mysql/mysql-connector-java/8.0.15/mysql-connector-java-8.0.15.jar" />
+
+        <context id="DB2Tables" targetRuntime="MyBatis3">
+            <!--公共配置-->
+            <commentGenerator  >
+                <!--生成java文件字符集-->
+                <property name="javaFleEncoding" value="UTF-8"/>
+                <!--是否去掉注释-->
+                <property name="suppressAllComments" value="true" />
+                <!--是否去掉生成日期-->
+                <property name="suppressDate" value="true"/>
+            </commentGenerator>
+            <!--数据库连接配置-->
+            <jdbcConnection driverClass="${jdbc.driverClassName}"
+                            connectionURL="${jdbc.url}"
+                            userId="${jdbc.user}"
+                            password="${jdbc.password}">
+            </jdbcConnection>
+
+            <!--公共生成配置-->
+
+            <!--配置生成时类型转换-->
+            <javaTypeResolver >
+                <property name="forceBigDecimals" value="false" />
+            </javaTypeResolver>
+
+            <!--配置实体类相关-->
+            <javaModelGenerator targetPackage="com.kwb.entity" targetProject="./src/main/java">
+                <!--是否允许子包-->
+                <property name="enableSubPackages" value="false" />
+                <!--是否去掉两端的空格-->
+                <property name="trimStrings" value="true" />
+                <!--是否生成构造方法-->
+                <property name="constructorBased" value="false"/>
+            </javaModelGenerator>
+
+            <!--配置xml文件位置-->
+            <sqlMapGenerator targetPackage="com.kwb.mappers"  targetProject="./src/main/java">
+                <!--是否语序子包-->
+                <property name="enableSubPackages" value="false" />
+            </sqlMapGenerator>
+
+            <!--配置Dao接口位置-->
+            <javaClientGenerator type="XMLMAPPER" targetPackage="com.kwb.dao"  targetProject="./src/main/java">
+                <!--是否允许子包-->
+                <property name="enableSubPackages" value="false" />
+            </javaClientGenerator>
+
+            <!--配置数据库表到java实体类转换-->
+            <table  tableName="publisher" domainObjectName="Publisher"
+                    enableCountByExample="false" enableUpdateByExample="false"
+                    enableDeleteByExample="false" enableSelectByExample="false"
+                    selectByExampleQueryId="false"/>
+            <table  tableName="book" domainObjectName="Book"
+                    enableCountByExample="false" enableUpdateByExample="false"
+                    enableDeleteByExample="false" enableSelectByExample="false"
+                    selectByExampleQueryId="false"/>
+        </context>
+    </generatorConfiguration>
+
+    3.pom:
+        <build>
+            <plugins>
+                <plugin>
+                    <groupId></groupId>
+                    <artifactId></artifactId>
+                    <version></version>
+                    <configuration>
+                        <overwrite></overwrite><!--生成xml文件时是否覆盖-->
+                        <
+                    </configuration>
+                    <config
+                </plugin>
+            </plugins>
+        </build>
+
+ps：
+maven去除test模块打包
+<plugin>
+    <groupId></groupId>
+    <artifactId></artifactId>
+    <version></version>
+    <configuration>
+        <skip>true</skip>
+    </configureation>
+</plugin>
+
+打包时将.xml等类型的文件也一起打包
+<resources>
+    <resource>
+        <directory>src/main/java</directory>
+        <includes>
+            <include>**/*.xml</include>
+        </includes>
+    </resource>
+    <resource>
+        <directory>src/main/resources</directory>
+        <includes>
+            <include>*.xml</include>
+            <include>*.properties</include>
+        </includes>
+    </resource>
+</resources>s
