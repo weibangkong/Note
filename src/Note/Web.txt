@@ -105,17 +105,3 @@ JSP与Servlet的异同点：
 
     ps:s
         Session只有在访问JSP、Servlet时才会生成，在访问HTML、Image等静态资源时并不会创建Session，可以通过request.getSession(true)获得
-
-
-Hibernate:
-    SessionFactory是否是线程安全的，Session呢，两个线程可以共享一个Session么
-    SessionFactory是线程安全的，可以同时被多个线程访问，Session是一个轻量级非线程安全的对象，线程之间也不能共享
-
-    SessionFactory一般在程序启动时构建，最好做成单例模式
-    Session表示与数据库进行交互的工作单元，Session由SessionFactory创建，在任务完成之后关闭(应关闭)，Session是持久层服务对外提供的主要接口
-    Session会延时获取数据库连接(在需要的时候才会获取)，为了避免创建过多Session，可以将其与ThreadLocal绑定，Hibernate3中的SessionFactory
-    .getCurrentSession()就可以做到
-
-    get()和load()的区别:
-        1.返回值:在一级缓存Session里存在记录时，get()和load()都返回实际对象，在Session中不存在缓存时，去二级缓存中查询在没有查找到记录时，get()返回null，load()抛出异常
-    2：get()方法直接返回实体类对象，load()方法返回实体类对象的代理
