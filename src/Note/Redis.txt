@@ -88,7 +88,7 @@ List(列表):简单的字符串列表,按照插入顺序排序，可以在头部
     lpop key                                      移除头部第一个元素并将其打印
     rpop key                                      移除尾部第一个元素并将其打印
     ltrim key start end                           截取，保留[start,end]之间的元素
-    llend key                                     获取指定key的List的长度
+    llen key                                      获取指定key的List的长度
     lindex key index                              返回指定index的值
     blpop key... timeout                          移除被指定key的第一个元素，如果key不存在，则会阻塞该List，直至发现可弹出元素或等待超时
     brpoplpush source destination timeout         从source中弹出一个元素添加到destination中，具有等待超时的功能
