@@ -1,3 +1,93 @@
 配置文件:
     ref = "实例"
     value = "类"
+
+
+classpath:指WEB-INF文件夹下的classes目录，
+WEB-INF/classes：则是src下的文件经过编译后形成的.class文件、xml、properties等资源文件存放位置，这是一个定位资源的入口。
+    引用classpath路径下的文件，自需要在文件名前加classpath：即可
+classpath:与classpath*:的区别:前者只会到classes目录向寻找资源而后者还会到jar文件中查找
+
+    ps:src不是classpath，WEB-INF/classes，lib才是classpath，WEB-INF/是资源目录，客户端不能直接访问；
+       lib与classes同属于classpath，访问优先级：lib>classes。
+
+Spring
+    控制反转(IoC -- Inversion of Control):
+        将控制权交出，由容器负责对象的创建，销毁等管理行为，而不是传统的在对象内部直接控制
+        关键:谁控制谁，控制什么，为什么是反转，什么被反转
+        谁控制谁:容器控制对象
+        控制什么:控制外部资源的获取(不止是对象包括文件等)
+        什么是反转:传统的应用程序中由我们主动的在程序内部获取依赖对象(正转)，反转就是由容器来创建及注入依赖对象
+        为什么是反转:因为是容器帮我们查找并且注入依赖对象，对象只是被动的接受依赖对象，所以是反转
+        什么被反转了：依赖对象的获取被反转了
+        IoC能做什么:松耦合
+            传统应用是我们在类内部主动创建对象的依赖，从而导致类之间的高度耦合，有了IoC容器后，把创建和查找依赖对象的控制权交给了容器，由容器
+            进行注入组合对象，所以对象与对象之间是松散耦合，方便测试以及更能复用，更重要的是是程序整个体系结构变得灵活
+            带来的最大该改变不是编码，而是思想上，发生了"主从换位"的变化。原来是应用程序需要什么就去要什么，在IoC思想中，变成程序被动等待容器
+            来创建和注入程序所需的资源
+        IoC容器帮对象找相应的依赖对象并注入，而不是由对象主动。
+    依赖注入(DI -- Dependicy Injection)：
+        组件之间依赖关系由容器在运行时决定，即由容器动态的将某个依赖关系注入到组件之中
+        关键:谁依赖谁，为什么需要依赖，谁注入谁，注入了什么
+        谁依赖谁：应用程序依赖IoC容器
+        为什么需要依赖:应用程序需要IoC容器来提供对象需要的外部资源
+        谁注入谁:IoC容器注入应用程序对象，应用程序依赖的对象
+        注入了什么:就是注入某个对象所需要的外部资源(包括对象，资源，常量)
+        DI能做什么:高可用(高复用)
+AOP:面向切面编程
+    与传统OOP编程相比，OOP是自上而下的线性编程，在这个自上而下的过程中会产生一些横切性的问题(多个地方都存在或者多处相似却与业务逻辑无关的问题)
+    ，这些横切问题和业务逻辑关系不大，散落在代码的各个地方，难以维护，AOP编程思想就是把业务逻辑和横切性的问题进行分离，从而达到解耦的作用，
+    提高代码重用率和开发效率。
+
+    应用场景:
+    日子记录
+    权限验证
+    检查效率
+    事务管理
+
+    AOP底层实现:
+    JDK动态代理：
+    CGLIB动态代理:
+
+    @EnableAspectJAutoProxy:使用该注解开启AspectJ支持,该注解默认proxyTargetClass=false，在该条件下，如果target Object实现了接口，
+    则使用JDK动态代理实现，否则(不实现接口)，使用CGLIB动态代理实现；在使proxyTargetClass=true，在该条件下，强制使用CGLIB动态代理。
+    代理是在spring的IoC容器初始化时完成的-->所以织入是在spring的IoC容器初始化时完成的-->(织入:将advice 织入到targetObject中，
+    形成代理对象的过程叫做织入)
+
+
+    是编译时织入还是运行时织入------------->compile time(using the AspectJ compiler,for example),load time,or at runtime
+    是在Spring容器初始化时期织入还是获取对象时期织入，源码分析是容器初始化时期织入，在容器初始化时完成的织入(代理对象的生成)
+
+
+    在什么时候完成代理:
+
+
+    通过runtime proxies实现
+
+    Spring Aop和AspectJ关系：
+    Aspectj同样时AOP思想的一种实现，在Spring2.5时Spring也有自己的实现，但是语法繁琐不易使用，所以借鉴AspectJ语法，例如:声明切面所使用的
+    @Aspect就是AspectJ的注解，并不是Spring Aop的内容
+
+
+    连接点（join point）：织入通知的方法
+    切点（pointcut）；多个连接点集合
+    通知/增强（advice）；
+        Before advice
+        After returning advice
+        After throwing advice
+        After(finally) advice
+        Around advice
+
+    引入（introduction）
+    织入（weaving）:将通知引入
+    切面（aspect）: join point + pointcut + advice 所在位置组成一个切面
+    目标（target）:被织入通知的类
+    aop proxies:被织入后形成的新对象，叫做aop代理对象
+
+
+
+SpringMVC:
+    核心:
+        DispatcherServlet
+    工作原理:
+
