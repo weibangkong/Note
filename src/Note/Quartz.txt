@@ -86,7 +86,7 @@ Quartz.properties
         作业存储设置：描述在调度器实例的生命周期中，Job和Trigger信息是如何被存储的
 
         线程池属性
-            org.quartz.threadPool.class: org.quartz.simpl.SimpleThreadPool       线程池实现类(一般SimpleThreadPool即可满足所有用户需求)
+            org.quartz.threadPool.class: org.quartz.simple.SimpleThreadPool       线程池实现类(一般SimpleThreadPool即可满足所有用户需求)
             org.quartz.threadPool.threadCount: 10      工作线程数，至少为1，无默认值，一般设置1-100之间的整数，单个任务执行时间太长，需要减小该值
             org.quartz.threadPool.threadPriority: 5    线程优先级，最大为java.lang.Thread.MAX_PRIORITY 10,最先MIN_PRIORITY 1，越高越先执行
 
@@ -99,7 +99,7 @@ springboot 整合quartz：
 
 
         @Configuration
-        public class SchedledConfiguration {
+        public class ScheduledConfiguration {
 
             // 配置中设定了
             // ① targetMethod: 指定需要定时执行scheduleInfoAction中的simpleJobTest()方法
@@ -121,14 +121,14 @@ springboot 整合quartz：
             向context中添加Trigger
             @Bean(name = "cronTriggerBean")
             public CronTriggerBean cronTriggerBean(MethodInvokingJobDetailFactoryBean detailFactoryBean){
-                CronTriggerBean tigger = new CronTriggerBean ();
-                tigger.setJobDetail (detailFactoryBean.getObject ());//将JobDetail赋给Trigger
+                CronTriggerBean trigger = new CronTriggerBean ();
+                trigger.setJobDetail (detailFactoryBean.getObject ());//将JobDetail赋给Trigger
                 try {
-                    tigger.setCronExpression ("0/5 * * * * ? ");//每5秒执行一次
+                    trigger.setCronExpression ("0/5 * * * * ? ");//每5秒执行一次
                 } catch (ParseException e) {
                     e.printStackTrace ();
                 }
-                return tigger;
+                return trigger;
 
             }
 
@@ -147,9 +147,9 @@ Spring 整合 Quartz
             <bean id="SimpleJobDetail" class="org.springframework.scheduling.quartz"
         2.使用JobDetailFactoryBean
     引入jar包：
-        因为quartz需要spring context支持所以需要导入spring-context-suuport
+        因为quartz需要spring context支持所以需要导入spring-context-support
         spring-context-support
-        需要导入sping的事务管理的jar包，否则会报错：从加载器中内省ScheduledFactoryBean失败
+        需要导入spring的事务管理的jar包，否则会报错：从加载器中内省ScheduledFactoryBean失败
         spring-tx
     Step：
         1.JobDetail
@@ -173,7 +173,7 @@ Spring 整合 Quartz
 
         2.Trigger
             SimpleTrigger:
-                <bean id="simpleTrigger" class="org.springframework.scheduling.quartz.SimpleTriggerFaactoryBean">
+                <bean id="simpleTrigger" class="org.springframework.scheduling.quartz.SimpleTriggerFactoryBean">
                     <property name="jobDetail" ref="simpleJobDetail"/>
                     <property name="startDelay" value="1000"/>       //第一次开始延迟
                     <property name="repeatInterval" value="1000"/>         //每次执行的间隔
