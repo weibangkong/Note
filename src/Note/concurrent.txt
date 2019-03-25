@@ -166,8 +166,29 @@
         sleep(XX) 休眠
         wait()    等待
         yield()   让步
-
+        interrupt() 终断
+        stop()      停止----------->不推荐使用，优先使用interrupt()
         线程和进程：
             进程是具有一定独立功能的程序关于某个数据集合上的一次运行活动，是操作系统进行资源分配和调度的一个独立单位
             线程是进程的一个实体，是cpu调度和分派的基本单位，是比进程更小的能独立运行的基本单位
             线程的划分尺度小于进程，使得多线程编程通常能带来更好的性能和用户体验，但是多线程程序对其他程序不友好，可能占用更多资源
+
+
+线程池:
+    Executor：执行器
+
+    四种线程池:
+             newFixThreadPool 指定线程数目的线程次
+             newCacheThreadPool 可缓存的线程次
+             newSingleThreadPool 只有一个线程的线程池
+             newScheduledThreadPool 创建一个定长的线程池，来支持定时及周期性执行任务
+
+
+
+             对于Runnable任务，使用.execute(Runnable)执行
+             对与Callable任务，使用.submit(Callable)执行，并使用Future<?>来接受结果
+
+             .shutdown()关闭线程池，并不会立即关闭，会先将池内的任务执行完毕再关闭
+
+             ps:
+             Callable是有返回值的任务，Runnable是没有返回值的任务
