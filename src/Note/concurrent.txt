@@ -1,10 +1,34 @@
 并发:
     java.util.concurrent 包下
+四个并发级别：
+    阻塞:
+    无饥饿：没有线程优先级，就不会照成低优先级线程一直抢占不到资源形成饿死现象
+    无障碍：是最弱的非阻塞调度，两个线程如果无障碍的执行，那么不会因为临界区的问题导致一方挂起，一旦检测到冲突，就应该进行回滚，可能导致所有线程
+           都在回滚，而没有一个线程走出临界区，一种可行的无障碍实现可以通过一个“一致性标志”来实现，在线程开始操作前，先读取并保存这个标志，操作
+           完毕后，再次读取，如果不一致，重试操作。对于任何对有资源修改的操作，都需要更新这个一致性标记，表示数据数据不再安全
+    无锁：无锁的并行都是无障碍的，与无障碍不同的是，无锁的并发保证必然有一个线程能够在有限步内完成操作离开临界区
+    无等待：要求所有线程都能够在有限步内完成操作离开临界区，一种典型的无等待就是RCU(Read Copy Update):对数据的读不加控制，但在写的时候先获取
+           原始数据的副本，接着只修改副本数据，修改完成后，在合适的时机在写回数据
+
+    Amdahl(阿姆达尔)定律：定义了串行系统并行化后的加速比的计算公式和理论上限
+        加速比定义：加速比= 优化前系统耗时/优化后系统耗时
+                       = 1/(F+1/n(1-F))--------->F:所有任务中串行任务所占比例，n处理器个数
+
+    Gustafson(古斯塔夫森)定律:
+        加速比定义：加速比= 优化前系统耗时/优化后系统耗时
+                        =n-F(n-1)
+
+
+    多线程的原子性，可见性，有序性
+            原子性：
+            可见性：一个线程对一个变量的修改，另一个线程并不知道变量大声了修改是为不可见
+            有序性：
 
     线程的四个属性:
         1.优先级: setPriority（）调整，优先级再1-10之间，默认为5，MIN_PRIORITY = 1, MAX_PRIORITY = 10;
                  static void yield(),使调用线程进入让步状态，即将运行权授予相同优先级的其他进程，该方法是一个静态方法。
-        2.守护进程 setDemon(boolean isDaemon)设置是否为守护进程。
+        2.守护进程 setDaemon(boolean isDaemon)设置是否为守护进程。
+                在调用守护线程的start()前，必须调用.setDaemon(true),当一个java应用程序内制用一个守护线程是，java虚拟机会自动退出
         3.线程组 ThreadGroup,通过调用getThreadGroup()获取线程所在线程组
         4.未捕获异常处理器 处理器必须实现Thread.UncaughtExceptionHandler接口,
           该接口仅有一个方法void uncaughtExecption(Thread t, Throwable e)
@@ -36,6 +60,10 @@
         ps: Callable是接口是一个参数化的类型，而Runnable是一个非参数化的，可以将Runnable想象成一个没有阐述和返回值的
             异步方法，而Callable是有返回值的
 
+    start()与run()的区别：
+        执行start()会创建一个新线程，并且让这个线程执行run(),
+        执行run()是在当前线程内run，并不会创建一个新线程，而只是作为一个普通的方法调用，是在当前所在线程内串行调用run()方法
+
     临界区:
         可能被多个线程同时执行的代码片段
 
@@ -52,7 +80,7 @@
 
     实现同步的的4中方式:
         1.synchronized
-        2.ReentrantLock  lock = new ReenTrantLock();
+        2.ReenTrantLock  lock = new ReenTrantLock();
           lock.lock();
           try{
               do something;
@@ -122,7 +150,7 @@
         ConcurrentSkipListSet
         ConcurrentLinkedQueue
 
-    synchronized:
+    synchronized:被synchronized限制的多个线程是串行执行的
         什么是synchronized：
             synchronized是java关键字,能够将代码块(方法)锁起来，只需在代码块添加synchronized关键字，即可实现同步(阻塞型)
             synchronized是一种互斥锁，一次只允许一个线程进入被锁住的代码块
@@ -141,6 +169,58 @@
     synchronized与Lock的区别:
         Lock能完成synchronized所实现的所有更能，Lock有比synchronized更精确的线程语义和更好的性能，并且不强制要求一定要获取到锁，
         synchronized会自动释放锁，而Lock必须手动释放，且最好在finally{}中释放
+
+    volatile:关键字，当使用volatile声明一个变量时，就等于告诉虚拟机，这个变量极有可能被某个程序或者线程修改，为了确保这个变量被修改后，
+            应用程序范围内的所有线程都能够看到这个改动，虚拟机就必须采取一些手段，保证该变量的可见性等特点，但是volatile不能代替锁，无法保证
+            一些符合操作的原子性，此外volatile可以保证数据的可见性与有序性
+
+    ReenTrantLock:重入锁(可以被同一线程多次获得)
+        重入锁的功能高级功能：
+            1.中断响应（可以相应中断） 使用lockInterruptibly(),可响应中断请求
+            2.锁申请等待限时lock.tryLock(time,TIME_UNIT);上锁是使用tryLock(),并指定获取锁的时间，超时未获得将返回false
+            3.公平锁 lock = new ReenTrantLock(boolean fair)
+
+    Condition：条件
+        Condition con = lock.newCondition();
+        con.await();使线程等待，需要先获取到锁
+        con.signal();唤醒线程，需要先获取到锁
+
+    Semaphore:信号量（允许多个线程同时访问一个资源，而synchronized和ReentrantLock都是只允许一个线程访问一个资源）
+        在构造信号量实例时，必须指定准入数，即同时申请多少个许可
+        方法：
+            acquire()   尝试获得一个准入许可，若无法获得，则线程等待，直到有线程释放许可或者被中断
+            acquireUnInterruptibly()，尝试获得一个准入许可，不响应中断
+            tryacquire()尝试获得一个许可，不会等待，成功即返回true，失败返回false
+            tryacquire(time,timeUnit)，在限定时间内等待
+            release()，释放许可
+
+    CyclicBarrier:循环栅栏
+
+
+    LockSupport:线程阻塞工具类
+        与Thread.suspend相比,弥补了由于resume()导致的线程无法继续执行的情况
+        方法不需要下那个Object.wait()那样需要先获取到锁，也不会抛出interruptException异常
+
+        LockSupport.park():阻塞当前线程，类似的还有parkNanos(),parkUntil()等方法，实现了显示等待，
+        LockSupport.park()会使线程编程WAITTING状态而不是像suspend()，而那样使线程进入RUNNABLE状态,该方法也可以响应中断，但是和其他接收
+        中断的方法不一样，它不会抛出InterruptionException异常，只会默默返回，但是可以通过Thread.interrupted()等方法获取中断标记
+
+
+        实现原理是使用信号量机制，给每个线程准备一个许可，当许可可用时，立即返回,并消费掉许可(就是将许可变为不可用状态)，如果许可不可用，就进入
+        阻塞状态，而unPark()方法相反，但是和信号量不同的是：许可不可以累加，一个线程不可能拥有多个许可，永远只有一个
+
+    ReenTrantReadWriteLock:读写锁
+        ReenTrantReadWriteLock readWriteLock = new ReenTrantReadWriteLock();------》获取读写锁
+        Lock readLock = readWriteLock.readLock();------》获取读锁
+        Lock writeLock = readWriteLock.writeLock();------》获取写锁
+
+        其中只有读线程和读线程之间不会阻塞，剩下的读-写、写-读、写-写均会发生阻塞。
+        其中读与读操作之间是并行操。
+
+    CountDownLatch：倒计数器，是一个实用的多线程控制类，这个工具通常用来控制线程等待，可以让一个线程等待直到倒计数结束，在开始执行
+        CountDownLatch cdl = new CountDownLatch(int nThread);------>构造时需要指定主线程要等待其他准备线程数目
+            在每个准备线程完成任务后，要调用cdl.countDown()来告知计数器，我已完成我的任务，计数减一
+            主线程会在计数器清零时（准备线程完成后）才开始执行,调用cdl.await()会使调用线程在cdl上进行等待
 
     题目:
         sleep()与wait()的区别:
@@ -164,26 +244,82 @@
             4.sleep()具有更好的可移植性
 
         sleep(XX) 休眠
-        wait()    等待
+        wait()    等待----使用Object.wait()必须在synchronzied{}中，notify()同样，都需要先获取目标对象的监听器
         yield()   让步
         interrupt() 终断
-        stop()      停止----------->不推荐使用，优先使用interrupt()
+        stop()      强行停止(也会强行停止正在执行的线程，可能会造成数据不一致的问题)----------->不推荐使用，优先使用interrupt()
+        join()  调用线程会等待被调用线程完成之后再继续执行
+        例如：
+        t1.run(){
+            t2.start();
+            t2.join();
+            sout("xxx");
+        }
+            t1.start();
+        t1在调用t2.join()会先让t2执行，等待t2执行完毕后才会继续执行t1线程剩下的任务，在调用t2.join()前，必须t2.start()
+
+        yeild()   使当前线程让出CPU，但是不代表当前线程不执行了，它让出cpu后，还会对cpu进行资源的争夺，如果争到就执行该线程，否则不执行，
+                  通常使用该方法以给其他线程工作的机会
+
         线程和进程：
             进程是具有一定独立功能的程序关于某个数据集合上的一次运行活动，是操作系统进行资源分配和调度的一个独立单位
             线程是进程的一个实体，是cpu调度和分派的基本单位，是比进程更小的能独立运行的基本单位
             线程的划分尺度小于进程，使得多线程编程通常能带来更好的性能和用户体验，但是多线程程序对其他程序不友好，可能占用更多资源
 
+        ps:
+            程序：是指令、数据及其组、组织形式的描述，进程是程序的实体；
+            进程是线程的容器
+
+            使用多线程而不是多进程的原因:线程之间的切换和调度成本远小于进程
 
 线程池:
     Executor：执行器
 
     四种线程池:
-             newFixThreadPool 指定线程数目的线程次
-             newCacheThreadPool 可缓存的线程次
+             newFixThreadPool 指定线程数目的线程次  -->LinkedBlockingQueue
+             newCacheThreadPool 可缓存的线程次  -->SynchronousQueue
              newSingleThreadPool 只有一个线程的线程池
              newScheduledThreadPool 创建一个定长的线程池，来支持定时及周期性执行任务
 
+    前三种实现都是通过new ThreadPoolExecutor(XXXX),通过指定不同的参数
+            ThreadFactory使用默认的ThreadFactory
+            构造方法中有corePoolSize,maximumPoolSize,keepAliveTime,timeUnit,workQueue,threadFactory,handler
+                7个参数:
+                    corePoolSize：是线程池中线程数量
 
+                    maximumPoolSize:最大数量
+
+                    keepAliveTime：超出容量的线程的存活时间
+
+                    timeUnit：存活时间单位
+
+                    workQueue(BlockingQueue):任务队列
+                        直接提交队列：SynchronousQueue-->该队列没有容量，每一个插入操作都要等待一个响应的删除操作，删除操作则需要等待一
+                                    个插入炒作，提交的任务不会被真实保存，而总是将新任务提交给线程执行，如果没有空闲线程，则创建新线程，
+                                    如果到达maximumPoolSize，则执行拒绝策略，所以一般使用该队列，需要指定很大的maximumPoolSize，
+                                    否则很容易执行拒绝策略
+                        有界任务队列：ArrayBlockingQueue-->先进先出，当前线程数小于corePoolSize，创建线程，执行任务，当大于时，添加到
+                                    队列中，当队列满时，如果线程数量小于maximumPoolSize，继续创建线程，否则执行拒绝策略
+                        无界任务队列：LinkedBlockingQueue-->先进先出，当前线程数小于corePoolSize，创建线程，执行任务，当线程数到达
+                                    corePoolSize，时不在创建新的线程，任务添加到队列中，直到系统内存耗尽
+                        优先任务队列：PriorityBlockingQueue
+
+                    threadFactory:线程工厂，一般使用默认即可
+
+                    handler(RejectedExecutionHandler):拒绝策略。当任务太多处理不过来时，如何拒绝任务
+
+            使用线程池；可能会导致异常被覆盖掉，顺着堆找，只能找到线程池中的调度流程，无法找到抛出的异常
+                解决方法：
+                      1.使用.execute(Runnable)代替.submit(Runnable)
+                      2.使用Future<?> re = .submit(Runnable)
+    超负载：使用拒绝策略
+          JDK内置四种拒绝策略:
+                AbortPolicy：该策略会直接抛出异常，组织系统正常执行。
+                CallerRunsPolicy:只要线程池未关闭，该策略直接在调用者线程中，运行当前被丢弃的任务，这样并不会真的丢弃线程，但是，任务提交
+                    线程得到性能极有可能急剧下降
+                DiscardOldestPolicy:该策略丢弃最老的一个任务，也就是即将被执行的任务，并尝试再次提交当前任务
+                DiscardPolicy:该策略默默的丢弃无法处理的任务，不予任何处理。
+          以上内置策略均实现RejectedExecutionHandler,自定义拒绝策略也可以实现该接口
 
              对于Runnable任务，使用.execute(Runnable)执行
              对与Callable任务，使用.submit(Callable)执行，并使用Future<?>来接受结果
@@ -192,3 +328,32 @@
 
              ps:
              Callable是有返回值的任务，Runnable是没有返回值的任务
+
+
+Fork/Join框架：
+    分而治之，
+    fork()创建新线程
+    join()等待
+
+
+
+
+无锁操作:
+基于CAS(compare and swap)比较替换
+    AtomicInteger:无锁的线程安全的整数
+    AtomicLong:无锁的线程安全的长整型
+    AtomicReference<?>：无锁的线程安全的对象引用，但是仍会存在问题，比如线程1记录了期望值，线程2修改成别的数，但是最后又修改回来了，线程1仍是
+    认为当前数值和期望值相同，会进行修改
+    AtomicStampedReference<?>:与AtomicReference相比，多了一个时间戳，比较是比较的除了当前值和期望值外，还会比较期望标记值和当前标记值，当
+    两者都一致时才会进行修改
+
+    AtomicIntegerArray
+    AtomicLongArray
+    AtomicReferenceArray<> 原子对象数组
+
+    AtomicIntegerFieldUpdater<?> updater = AtomicIntegerFieldUpdater.newUpdater()
+    上面的一个原子工具类可以使普通变量也可以使用原子操作
+        使用该工具有3点需要注意的：
+            1.updater只能修改他可见范围的变量，因为Updater使用反射得到这个变量，如果变量不可见，就会出错，比如private
+            2.为了保证变量可以被正确的读取，必须使volatile类型的
+            3.应为CAS操作是通过对象实例中的偏移量(offset)来赋值，因此他不支持static字段
