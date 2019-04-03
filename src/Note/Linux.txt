@@ -54,6 +54,7 @@ Linux命令
     poweroff               关机
     shutdown -h now        关机
     restart                重启
+    reboot                 重启
     man command        查看命令帮助手册
     command --help     帮助手册
     uname              系统信息
@@ -185,6 +186,13 @@ Linux命令
         1.系统级环境变量       所有用户登陆后都会加载
         2.用户级环境变量       配置的操作只有在当前用户下有效
         3.临时环境变量         在当前终端中有效
+
+配置Java环境变量:
+    export JAVA_HOME=/usr/local/jdk1.8
+    export JRE_HOME=${JAVA_HOME}/jre
+    export CLASSPATH=.:${JAVA_HOME}/lib:${JRE_HOME}/lib
+    export PATH=.:${JAVA_HOME}/bin:$PATH
+
 vim命令
     i   插入
 
