@@ -237,3 +237,23 @@ maven去除test模块打包
         </includes>
     </resource>
 </resources>s
+
+
+动态SQL是Mybatis的强大特性之一，也是它优于其他ORM框架的一个原因，Mybatis在对sql语句进行预编译之前，会对sql进行动态解析，
+解析为一个BoundSql对象，也是在此处对动态SQL进行处理的，在动态SQL解析阶段，#{}和${}会有不同表现。
+#{} 被解析为一个JDBC预编译语句（prepared statemend）的参数标记符,变量替换发生在DBMS中，并且可以制动转换参数类型。
+比如：
+select * from user where name = #{name}; 会被解析为 select * from user where name = ?;
+一个#{}被解析为一个参数占位符？
+${} 仅仅是一个纯粹的String 替代，在动态SQL解析阶段就会进行变量替换,而#{}发生在DBMS中
+与上面相同的语句会被解析为 select * from user where name = 'jack'
+获得的语句在预编译之前就已经不包含变量了,完全是常量数据了。
+使用时的注意事项：
+1.能用#{}就不用${},一是为了效率，相同的预编译sql是可以重复利用的，其次${}存在sql注入的危险，如下了情况:
+select * from ${tableName} where name = #{};
+如果传入的tableName 为user；delete from user； -- 经过Sql动态解析后，预编译之前的sql将变为：
+select * from user；delete from user；-- where name = ?
+--之后的语句为注释，不起作用
+2.在变量作为表名的时候只能使用${},这是因为表明是字符串，如果使用#{}(占位符)会带上'',会导致sql语法错误，但是可以加反引号
+
+mybatis默认情况下，会对所有的sql进行预编译
