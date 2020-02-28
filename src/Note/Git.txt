@@ -30,7 +30,7 @@ Git:
     日志记录：
     git log
     git show          显示仓库分支列表(待定)
-    git tatus        显示工作区状态
+    git status        显示工作区状态
 
     分支和冲突解决
     git checkout XXX  切换到某个分支
