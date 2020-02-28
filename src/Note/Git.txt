@@ -19,18 +19,18 @@ Git:
     git diff                    显示提交之间、提交与工作去之间的差异
 
     提交拉取：
-        clone         克隆一个仓库到一个新目录
-        add           (在有新文件时使用),将文件添加到索引
-        commit        将文件提交到本地仓库
-        push          将文件推送到远程查看提交日志仓库
-        pull          更新代码或者拉去代码
-        fetch         从另外一个仓库下载一个对下那个和引用
-        init          创建一个空的Git仓库，或重新初始化一个已存在的仓库
+    git clone         克隆一个仓库到一个新目录
+    git add           (在有新文件时使用),将文件添加到索引
+    git commit        将文件提交到本地仓库
+    git push          将文件推送到远程查看提交日志仓库
+    git pull          更新代码或者拉去代码
+    git fetch         从另外一个仓库下载一个对下那个和引用
+    git init          创建一个空的Git仓库，或重新初始化一个已存在的仓库
 
     日志记录：
-        log
-        show          显示仓库分支列表(待定)
-        status        显示工作区状态
+    git log
+    git show          显示仓库分支列表(待定)
+    git tatus        显示工作区状态
 
     分支和冲突解决
         checkout XXX  切换到某个分支
@@ -52,3 +52,13 @@ Git:
     3.git commit -m "这里添加注释"
     4.git remote add origin https:github.com/weibangkong/xxxx.git
     5.git push -u origin master
+    git checkout XXX  切换到某个分支
+    git branch        查看当前所在分支
+    git branch -a     查看所有分支
+    git branch XXX    创建XXX分支
+    git merge         合并分支
+    git diff          显示两个提交，或提交与工作区之间的差异
+    git rebase        逐个文件进行合并，如果出现冲突需要手动解决，可以在合并过程之中取消合并，并且回滚代码
+    git rebase --continue   继续合并
+    git rebase --skip       跳过
+    git rebase --abort      取消合并，回滚代码

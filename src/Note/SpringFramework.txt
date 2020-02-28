@@ -6,7 +6,7 @@
 classpath:指WEB-INF文件夹下的classes目录，
 WEB-INF/classes：则是src下的文件经过编译后形成的.class文件、xml、properties等资源文件存放位置，这是一个定位资源的入口。
     引用classpath路径下的文件，自需要在文件名前加classpath：即可
-classpath:与classpath*:的区别:前者只会到classes目录向寻找资源而后者还会到jar文件中查找
+classpath:与classpath*:的区别:前者只会到classes目录下寻找资源,而后者还会到jar文件中查找
 
     ps:src不是classpath，WEB-INF/classes，lib才是classpath，WEB-INF/是资源目录，客户端不能直接访问；
        lib与classes同属于classpath，访问优先级：lib>classes。

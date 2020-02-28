@@ -57,7 +57,7 @@
                     Thread thread = new Thread(oneTask);
         4.线程池创建
 
-        ps: Callable是接口是一个参数化的类型，而Runnable是一个非参数化的，可以将Runnable想象成一个没有阐述和返回值的
+        ps: Callable是接口是一个参数化的类型，而Runnable是一个非参数化的，可以将Runnable想象成一个没有参数和返回值的
             异步方法，而Callable是有返回值的
 
     start()与run()的区别：
@@ -79,8 +79,10 @@
 
 
     实现同步的的4中方式:
-        1.synchronized
-        2.ReenTrantLock  lock = new ReenTrantLock();
+        1.synchronized方法(原子性，有序性)
+        2.synchronized代码块(原子性，有序性)
+        3.volatile保证了可见性，但是代码仍然会被编译器优化（可见性）
+        4.ReenTrantLock  lock = new ReenTrantLock();(原子性，有序性)
           lock.lock();
           try{
               do something;
@@ -89,7 +91,6 @@
           }finally{
               lock.unlock();
           }
-        3.
 
 
 

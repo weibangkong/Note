@@ -63,7 +63,7 @@ MySQL:
         sex int check(sex in ("0","1")),
         tel varchar(32) not null,
         class int foreign key references t_class(class_id)
-    ) endine = innodb default charset = utf8 comment '注释';
+    ) engine = innodb default charset = utf8 comment '注释';
 
 视图：
     create view viewName as
@@ -98,7 +98,7 @@ MySQL:
 查询：
     select [distinct] columeName from tableName;
 
-    order by columeName DESC(从大到小/降序,ASC为升序/从小到大)
+    order by columeName DESC(从大到小/降序,ASC为升序/从小到大，默认为ASC)
 
     where name like '%孔维邦%'包含孔维邦
     where name like '孔维邦%' 以孔维邦开头
@@ -110,6 +110,30 @@ MySQL:
 
     查看warning:
     show warnings;
+
+    符合排序
+
+
+用户变量：
+    场景如下：
+    对查询结果添加一个序号:
+        SELECT (@i:=@i+1) i FROM vote, (SELECT @i:=0) AS i
+
+        SELECT (@i:=@i+1) 别名  FROM 表明, (SELECT @i:=0) AS 别名
+
+        根据学生成绩对学生排名
+        +----+--------+-------+
+        | id | name   | score |
+        +----+--------+-------+
+        |  1 | 张三   |    80 |
+        |  2 | 李四   |    82 |
+        |  3 | 王五   |    80 |
+        |  4 | 赵六   |    90 |
+        |  5 | 李二   |    91 |
+        |  6 | 孔零   |    67 |
+        +----+--------+-------+
+        select (@i:= @i+1) 排名, student.id 学号,student.name 姓名,student.score 分数 from student ,(select @i:=0) as i order by score,name desc;
+
 
 delimiter // 定义结速符，当输入定义好的结速符后mysql会立即执行
 
@@ -271,3 +295,14 @@ sql优化:
     2.exists代替in
     3.避免使用参数 select id from t where name =@name ，改为强制查询使用索引：select id from t with(index(索引名)) where name =@name
     4.避免在where 子句中进行表达式操作
+
+
+
+预编译:
+    sql预编译是指数据库驱动在发送sql语句和参数给DBMS之前会对sql进行编译，这样DBMS执行时，就不需要重新编译。
+
+为什么需要预编译:
+    JDBC中使用对象PreparedStatement来抽象预编译语句,使用预编译。预编译阶段可以优化sql执行，预编译之后的sql多数情况下可以直接执行,
+    DBMS不需要再次编译，越是复杂的sql编译的复杂度越高，预编译可以合并多个操作为一个操作，预编译对象可以重复利用，把一个sql编译后产生的
+    PreparedStatement对象缓存下来，下次对于同一个sql，可以直接使用这个缓存的pareparedState对象。（mybatis默认情况下，会对所有的sql
+    预编译进行）。
