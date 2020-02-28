@@ -33,25 +33,6 @@ Git:
     git tatus        显示工作区状态
 
     分支和冲突解决
-        checkout XXX  切换到某个分支
-        branch        查看当前所在分支
-        branch -a     查看所有分支
-        branch XXX    创建XXX分支
-        merge         合并分支
-        diff          显示两个提交，或提交与工作区之间的差异
-        rebase        逐个文件进行合并，如果出现冲突需要手动解决，可以在合并过程之中取消合并，并且回滚代码
-        rebase --continue   继续合并
-        rebase --skip       跳过
-        rebase --abort      取消合并，回滚代码
-
-
-
-    github操作示例：
-    1.git init
-    2.git add .
-    3.git commit -m "这里添加注释"
-    4.git remote add origin https:github.com/weibangkong/xxxx.git
-    5.git push -u origin master
     git checkout XXX  切换到某个分支
     git branch        查看当前所在分支
     git branch -a     查看所有分支
@@ -62,3 +43,12 @@ Git:
     git rebase --continue   继续合并
     git rebase --skip       跳过
     git rebase --abort      取消合并，回滚代码
+
+
+
+    github操作示例：
+    1.git init
+    2.git add .
+    3.git commit -m "这里添加注释"
+    4.git remote add origin https:github.com/weibangkong/xxxx.git
+    5.git push -u origin master
