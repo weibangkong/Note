@@ -43,3 +43,12 @@ Git:
         rebase --continue   继续合并
         rebase --skip       跳过
         rebase --abort      取消合并，回滚代码
+
+
+
+    github操作示例：
+    1.git init
+    2.git add .
+    3.git commit -m "这里添加注释"
+    4.git remote add origin https:github.com/weibangkong/xxxx.git
+    5.git push -u origin master
