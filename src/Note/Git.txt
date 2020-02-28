@@ -2,7 +2,7 @@ Git:
     git clone XXX               默认下载到当前目录，所以要先cd
     git add                     将文件内容添加到索引
     git commit                  提交到本地仓库
-    git commit -m “XXX”         为提交添加注释或描述
+    git commit -m "XXX"         为提交添加注释或描述
     git push    .........       推送到远端仓库
     git pull XXX                拉取代码
     git branch                  查看当前所在分支
