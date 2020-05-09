@@ -306,3 +306,7 @@ sql优化:
     DBMS不需要再次编译，越是复杂的sql编译的复杂度越高，预编译可以合并多个操作为一个操作，预编译对象可以重复利用，把一个sql编译后产生的
     PreparedStatement对象缓存下来，下次对于同一个sql，可以直接使用这个缓存的pareparedState对象。（mybatis默认情况下，会对所有的sql
     预编译进行）。
+
+对json类型中某个值判断:
+json_extract(column,'$.key') ='xxx'
+

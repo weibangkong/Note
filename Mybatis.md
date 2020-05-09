@@ -9,3 +9,25 @@ java.lang.RuntimeException: org.apache.ibatis.binding.BindingException: Mapper m
 ```
 
 使用resultMap则不会出现该问题
+
+### 2.脚本对Boolean 类型的值是否为空的判断问题
+
+```xml
+<where>
+	<if test='null != isTrue and "" != isTrue'>
+		and isTure = ${isTrue}
+	</if>
+</where>
+```
+
+上面的写法会造成在isTrue 为false的情况下，不拼接条件语句的问题，默认为isTrue== ""
+
+因此在对Boolean 类型的条件判断是只需要判断其是不是null即可，示例如下
+
+```xml
+<where>
+	<if test='null != isTrue'>
+		and isTure = ${isTrue}
+	</if>
+</where>
+```
