@@ -10,6 +10,8 @@ java.lang.RuntimeException: org.apache.ibatis.binding.BindingException: Mapper m
 
 使用resultMap则不会出现该问题
 
+造成该问题的另外的原因是，如果resultType使用的是基本类型的包装类型，那么在调用的方法接收返回值的时候如果使用的是基本类型接受，如果查出来的是null,同样会抛出该异常
+
 ### 2.脚本对Boolean 类型的值是否为空的判断问题
 
 ```xml
