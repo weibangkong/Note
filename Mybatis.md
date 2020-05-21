@@ -31,3 +31,28 @@ java.lang.RuntimeException: org.apache.ibatis.binding.BindingException: Mapper m
 	</if>
 </where>
 ```
+
+### 3.模糊查询
+
+```xml
+<script>
+	SELECT studentNo FROM student WHERE name LIKE CONCAT('%',#{name},'%')
+</script>
+```
+
+### 4.遍历拼接条件
+
+```xml
+<script>
+	INSERT INTO student(id,name,birthday,sex) VALUES
+    <foreach collection="list" index="index" item="item" separator=",">
+    	(
+        	#{item.id},
+        	#{item.name},
+        	#{item.birthday},
+        	#{item.sex}
+     	)
+    </foreach>
+</script>
+```
+
