@@ -49,13 +49,26 @@
 
 
 
+### 五：创建项目并与远端仓库关联
 
-
-
-
-##### 五：创建项目并与远端仓库关联
+```
 1.git init
 2.git add .
 3.git commit -m "这里添加注释"
 4.git remote add origin https:github.com/weibangkong/xxxx.git
 5.git push -u origin master
+```
+
+
+
+### 六：分支合并
+
+```
+e.g.     将uat 分支合并到master上
+1.git checkout uat
+2.git pull
+3.git checkout master
+4.git merge uat
+5.git pull
+```
+
