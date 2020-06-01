@@ -58,3 +58,28 @@ java.lang.RuntimeException: org.apache.ibatis.binding.BindingException: Mapper m
 </script>
 ```
 
+### 5.不生成xml文件(即不指定数据库字段到类属性的映射),在字段名结果名不一致的情况下，查询出来字段结果名为null的情况
+
+```yaml
+myabtis：
+	configuration：
+		map-underscore-to-camel-case： true
+```
+
+##### 这种情况形成的原因就是没有指定映射，即数据库字段名和类属性不一致
+
+### 6.如果配置了映射但是，sql查询出来有数据但是却无法自动封装到实体中
+
+形成这种情况的原因可能是因为在项目中配置了多数据源，如果配置了多数据源，只需要多数据源的SqlSessionFactory配置上configuration即可，示例如下
+
+```java
+@Bean
+public SqlSessionFactory getSqlSessionFactory(DataSource datasource, org.apache.ibatis.session.Configuration config){
+    SqlSessionFactoryBean sqlSessionFactory = new SqlSessionFacotryBean(datasource);
+    sqlSessionFactory.setConfiguration(config);
+    return sqlSessionFactory.getObject();
+}
+```
+
+
+
