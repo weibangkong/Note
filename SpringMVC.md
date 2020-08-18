@@ -26,3 +26,26 @@
 
 put请求时，参数是放在url中的
 
+#### 7.转发服务，响应中的中文乱码:
+
+##### 1.检查方法
+
+```java
+@RequestMapping(produces=MediaType.APPLLICATION_JSON_UTF8_VALUE)
+```
+
+##### 2.检查配置文件中设置
+
+```yaml
+spring.http.encoding.charset: UTF-8
+新版本中的springboot
+spring.servlet.encoding.charset: UTF-8
+```
+
+##### 3.检查是不是使用response直接往外write么，如果是的话：
+
+```java
+response.setContentType(MediaType.APPLICATION_JSON_VALUE);
+response.getWriter().write(Object);
+```
+

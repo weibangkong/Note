@@ -10,3 +10,17 @@ INTO TABLE_2(id,dept,student_no) VALUES(2,'2018',‘stu001’)
 
 SELECT 1 FROM DUAL
 
+
+
+
+
+1.MySQL:
+
+1.JSON_EXSTRACT(COLUMN,'$.key') 去除来的是带引号的内容
+
+2.日期格式:%Y-%m-%d %H%i%s
+
+3.字符串转日期:
+
+STR_TO_DATA(date,formater)
+
