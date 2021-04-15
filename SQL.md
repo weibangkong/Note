@@ -60,7 +60,43 @@ select decode(sex, '1','男'，'2','女','未知') from user
 
 使用***group by***时，***group by***后面的分组字段要包括要查询的字段名
 
+## 6.row_number()与rownumber
 
+***row_number()***
+
+分组排序并生成伪劣
+
+```sql
+select row_number over(partition by col1 order col2) from table
+```
+
+***rownumber***
+
+```sql
+select * from (select t.*,rownum as rn from (select * from user order by username) t) where rn between 90001 and 90010
+```
+
+上面的结果查询效率不如下面三重分页(大家常用的分页)
+
+```sql
+select * from (select t.*,rownum as rn from (select * from user order by username) t) where rn >= 90001 and rownum <= 10
+```
+
+[可以参考一篇博客]: https://www.cnblogs.com/autumnlj/p/5815210.html
+
+## 7.递归查询start with
+
+递归查询上级企业
+
+```sql
+select * from grp start with grpno = '1' connect by prior by grpno = upgrpno
+```
+
+递归查询下级企业
+
+```
+
+```
 
 
 
