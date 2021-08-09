@@ -33,22 +33,22 @@ ps：
 
 常量池中的每一项常量都是一个表，jdk1.7新增3各支持动态语言调用的表，共计14个表，他们都有共同的特点，即表开头的第一位是一个1字节(u1)的标志位(tag)代表这个常量属于哪种常量类型
 
-| 类型                   | 标志 | 描述               |
-| ---------------------- | ---- | ------------------ |
-| CONSTANT_Utf8_info     | u1   | UTF-8编码的字符串  |
-| CONSTANT_Integer_info  | u3   | 整型字面量         |
-| CONSTANT_Float_info    | u4   | 浮点型字面量       |
-| CONSTANT_Long_info     | u5   | 长整型字面量       |
-| CONSTANT_Double_info   | u6   | 双精度浮点型字面量 |
-| CONSTANT_Class_info    | u7   | 类或接口的符号引用 |
-| CONSTANT_String_info   | u8   | 字符串类型字面量   |
-| CONSTANT_Fieldref_info | u9   | 字段的符号引用     |
-| CONSTANT_Integer_info  |      |                    |
-| CONSTANT_Integer_info  |      |                    |
-| CONSTANT_Integer_info  |      |                    |
-| CONSTANT_Integer_info  |      |                    |
-| CONSTANT_Integer_info  |      |                    |
-| CONSTANT_Integer_info  |      |                    |
+| 类型                             | 标志 | 描述                     | 结构 |
+| -------------------------------- | ---- | ------------------------ | ---- |
+| CONSTANT_Utf8_info               | 1    | UTF-8编码的字符串        |      |
+| CONSTANT_Integer_info            | 3    | 整型字面量               |      |
+| CONSTANT_Float_info              | 4    | 浮点型字面量             |      |
+| CONSTANT_Long_info               | 5    | 长整型字面量             |      |
+| CONSTANT_Double_info             | 6    | 双精度浮点型字面量       |      |
+| CONSTANT_Class_info              | 7    | 类或接口的符号引用       |      |
+| CONSTANT_String_info             | 8    | 字符串类型字面量         |      |
+| CONSTANT_Fieldref_info           | 9    | 字段的符号引用           |      |
+| CONSTANT_Methdoref_info          | 10   | 类中方法的符号引用       |      |
+| CONSTANT_InterfaceMethodref_info | 11   | 接口中方法的符号引用     |      |
+| CONSTANT_NameAndType_info        | 12   | 字段或方法的部分符号引用 |      |
+| CONSTANT_MethodHandle_info       | 15   | 方法句柄                 |      |
+| CONSTANT_MethdoType_info         | 16   | 标识方法类型             |      |
+| CONSTANT_InvokeDynamic_info      | 18   | 动态方法调用点           |      |
 
 
 

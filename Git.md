@@ -49,7 +49,7 @@
 
 
 
-### 五：创建项目并与远端仓库关联
+## 五：创建项目并与远端仓库关联
 
 ```
 1.git init
@@ -61,7 +61,7 @@
 
 
 
-### 六：分支合并
+## 六：分支合并
 
 ```
 e.g.     将uat 分支合并到master上
@@ -72,3 +72,28 @@ e.g.     将uat 分支合并到master上
 5.git pull
 ```
 
+## 七: 分支比较
+
+### 1.查看A分支有而B分支没有的提交内容
+
+```java
+git log BRANCH_A ^BRANCH_B
+```
+
+### 2.查看A分支比B分支多的内容
+
+```java
+git log BRANCHE_B..BRANCH_A
+```
+
+### 3.对比两个分支又什么不同
+
+```java
+git log BRANCH_A...BRANCHE_B
+```
+
+### 4.两个分支有何不同并显示提交内容所属分支
+
+```java
+git log --left-right BRANCH_A...BRANCHE_B
+```
